@@ -13,7 +13,20 @@ ForEach Locations
 		spawn FSM
 
 // Roads
+initilize:	get traffic count from parameters
+
+forEach count:
+	FSM -> while traffic spawned = traffic coubt --> spawn 
+	
 [locations] spawn roadsFSM:
 	get Random location
 	find nearest road
 	get neighbours
+	if EXISTS
+		createGroup
+		spawn Car and Crew
+		setSkill 0;
+		addwaypoint
+	
+	if (destoyed or broken) - leave car -> walk to nearest town
+	if (reachd) -> choose new destination
