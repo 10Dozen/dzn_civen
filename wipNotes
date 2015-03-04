@@ -1,0 +1,19 @@
+Get all Locations GameLogic
+Create center - civilian
+ForEach Locations
+	Get Center Pos
+	Find all houses
+	Set civilians count (Houses * Mulptiplier by location type)
+	For "_i" from 0 to civilian Count
+		Home = random building
+		Create group
+		Create civilian unit (position in Home)	
+		unit setVar "home"
+		
+		spawn FSM
+
+// Roads
+[locations] spawn roadsFSM:
+	get Random location
+	find nearest road
+	get neighbours
