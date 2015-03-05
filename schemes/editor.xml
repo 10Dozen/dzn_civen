@@ -1,1 +1,7 @@
-s
+<GameLogic>
+  <Location>
+    <City></City>
+    <Town></Town>
+    <Village></Village>
+  </Location>
+</GameLogic>
