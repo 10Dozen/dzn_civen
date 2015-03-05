@@ -38,10 +38,29 @@ dzn_fnc_civen_initZones = {
 			_maxPopulation = round( _maxPopulation * ((count _buildings) / _maxPopulation));
 		};
 		
-		_x setVariable ["maxPopulation", _maxPopulation];		
-		player globalChat format ["| Location (%1) - max popul: %2", str(_x), _maxPopulation];
+		_x setVariable ["maxPopulation", _maxPopulation];
+		_x setVariable ["buildings", _buildings];
+		_x setVariable ["position", _pos];
 		
-
+		player globalChat format ["| Location (%1) - max popul: %2", str(_x), _maxPopulation];
+	
 	} forEach _cities + _towns + _villages;
+
+};
+
+dzn_spawn = {
+	// loc
+	_pos = getPosASL loc;
+	_center = createCenter CIVILIAN;
+	
+	_houses = loc getVariable "buildings";
+	_maxPopulation = loc getVariable "maxPopulation";
+	
+	for "_i" from 0 to _maxPopulation do {
+		_home = _houses call BIS_fnc_selectRandom;
+		_grp = createGroup CIVILIAN;
+		_unit = _grp createUnit ["C_man_shorts_2_F", _home buildingPos round(random 1), [], 0, "NONE"];
+		_unit setVariable ["home", _home];
+	};	
 
 };
