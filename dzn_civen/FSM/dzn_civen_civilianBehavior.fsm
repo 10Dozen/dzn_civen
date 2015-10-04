@@ -1,4 +1,4 @@
-/*%FSM<COMPILE "D:\GMZ\BI Toolz\FSM Editor Personal Edition\scriptedFSM.cfg, servicePoint">*/
+/*%FSM<COMPILE "D:\GMZ\BI Toolz\FSM Editor Personal Edition\scriptedFSM.cfg, dzn_civen_civilianBehaviour">*/
 /*%FSM<HEAD>*/
 /*
 item0[] = {"Start",0,4346,-50.000000,-1225.000000,50.000000,-1175.000000,0.000000,"Start"};
@@ -8,10 +8,10 @@ item3[] = {"Can_walk",4,218,-50.000000,-950.000000,50.000000,-900.000000,0.00000
 item4[] = {"Get_place_to__mo",2,250,-50.000000,-875.000000,50.000000,-825.000000,0.000000,"Get place to " \n "move"};
 item5[] = {"Wait_for_reach",4,218,150.000000,-875.000000,250.000000,-825.000000,0.000000,"Wait for reach"};
 item6[] = {"Standing",2,250,150.000000,-950.000000,250.000000,-900.000000,0.000000,"Standing"};
-item7[] = {"Can_t_walk",4,218,-175.000000,-950.000000,-75.000000,-900.000000,0.000000,"Can't walk"};
-item8[] = {"is_Danger",4,218,150.000000,-1150.000000,250.000000,-1100.000000,0.000000,"is Danger"};
-item9[] = {"Do_nothing",1,250,-175.000000,-875.000000,-75.000000,-825.000000,0.000000,"Do nothing"};
-item10[] = {"Danger",2,250,150.000000,-1225.000000,250.000000,-1175.000000,0.000000,"Danger"};
+item7[] = {"Can_t_walk",4,218,-175.000000,-1050.000000,-75.000000,-1000.000000,0.000000,"Can't walk"};
+item8[] = {"is_Danger",4,218,150.000000,-1050.000000,250.000000,-1000.000000,0.000000,"is Danger"};
+item9[] = {"End",1,250,-175.000000,-1225.000000,-75.000000,-1175.000000,0.000000,"End"};
+item10[] = {"Danger",2,250,150.000000,-1150.000000,250.000000,-1100.000000,0.000000,"Danger"};
 link0[] = {0,1};
 link1[] = {1,2};
 link2[] = {2,3};
@@ -26,39 +26,29 @@ link10[] = {6,8};
 link11[] = {7,9};
 link12[] = {8,10};
 link13[] = {10,1};
-globals[] = {25.000000,1,0,0,16777215,640,480,1,253,6316128,1,-213.930237,358.131897,-697.050476,-1289.753662,694,701,1};
-window[] = {0,-1,-1,-1,-1,971,125,1266,125,1,712};
+globals[] = {25.000000,1,0,0,16777215,640,480,1,253,6316128,1,-208.593872,363.468292,-672.503418,-1265.206543,536,701,1};
+window[] = {0,-1,-1,-32000,-32000,1143,-17,1434,297,1,554};
 *//*%FSM</HEAD>*/
 class FSM
 {
-  fsmName = "servicePoint";
+  fsmName = "dzn_civen_civilianBehaviour";
   class States
   {
     /*%FSM<STATE "Start">*/
     class Start
     {
       name = "Start";
-      init = /*%FSM<STATEINIT""">*/"private [""_unit"", ""_timer"", ""_loc"", ""_rand"", ""_house"", ""_destination"", ""_isAnim""];" \n
+      init = /*%FSM<STATEINIT""">*/"private [""_unit"", ""_timer"", ""_loc"", ""_rand"", ""_house"", ""_destination"", ""_isAnim"",""_debug""];" \n
        "" \n
        "_unit = _this select 0;" \n
        "_loc = _this select 1;" \n
        "" \n
-       "// Switch AI to dummy" \n
-       "_unit setSkill 0;" \n
-       "_unit disableAI ""TARGET"";" \n
-       "_unit disableAI ""AUTOTARGET"";" \n
-       "" \n
        "_destination = [0,0,0];" \n
        "_isAnim = false;" \n
        "" \n
-       "" \n
-       "_firedNearEH = _unit addEventHandler [""FiredNear"", {" \n
-       "	((_this select 0) getVariable ""homeLocation"") setVariable [""isSafe"", false];" \n
-       "}];" \n
-       "" \n
-       "" \n
        "_timer = time + 5;" \n
-       ""/*%FSM</STATEINIT""">*/;
+       "" \n
+       "_debug = false;"/*%FSM</STATEINIT""">*/;
       precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
       class Links
       {
@@ -68,7 +58,7 @@ class FSM
           priority = 0.000000;
           to="Safe";
           precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
-          condition=/*%FSM<CONDITION""">*/"(time > _timer) && (_loc getVariable ""isSafe"")"/*%FSM</CONDITION""">*/;
+          condition=/*%FSM<CONDITION""">*/"(time > _timer) && (_loc call dzn_fnc_civen_isLocationSafe)"/*%FSM</CONDITION""">*/;
           action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
         };
         /*%FSM</LINK>*/
@@ -79,13 +69,13 @@ class FSM
     class Safe
     {
       name = "Safe";
-      init = /*%FSM<STATEINIT""">*/"// Set ""SAFE"" behavior" \n
+      init = /*%FSM<STATEINIT""">*/"_unit call dzn_fnc_civen_switchToSafe;" \n
        "" \n
-       "_unit setBehaviour ""CARELESS"";" \n
-       "_unit setSpeedMode ""LIMITED"";" \n
-       "_unit setCombatMode ""GREEN"";" \n
+       "_timer = time + 5;" \n
        "" \n
-       "_unit allowDamage true;"/*%FSM</STATEINIT""">*/;
+       "if (_debug) then { player sideChat format [ ""Civil Behavior :: SAFE - timer %1"", _timer]; };" \n
+       "if (_debug) then { diag_log (format [ ""Civil Behavior :: SAFE - timer %1"", _timer]); };" \n
+       ""/*%FSM</STATEINIT""">*/;
       precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
       class Links
       {
@@ -93,7 +83,7 @@ class FSM
         class Can_t_walk
         {
           priority = 0.000000;
-          to="Do_nothing";
+          to="End";
           precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
           condition=/*%FSM<CONDITION""">*/"!(canStand _unit) && (time > _timer)"/*%FSM</CONDITION""">*/;
           action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
@@ -121,32 +111,27 @@ class FSM
        "_timer = time + 60;" \n
        "" \n
        "_rand = round(random 100);" \n
-       "_house =  (_loc getVariable ""houses"") call BIS_fnc_selectRandom;" \n
+       "_house =  ([_loc, ""buildings""] call dzn_fnc_civen_getLocProperty) call BIS_fnc_selectRandom;" \n
        "" \n
-       "if (_rand > 85) then {" \n
-       "	_destination = getPosASL _house;" \n
+       "if (_debug) then { player sideChat ""Civil Behavior :: Resolving!! ""; };" \n
+       "if (_debug) then {diag_log ""Civil Behavior :: Resolving!!""; };" \n
+       "" \n
+       "if (_rand > (100 - (dzn_civen_behavior_walkStandChance select 0))) then {" \n
+       "	_destination = _house buildingPos ((_house call dzn_fnc_getHousePositions) call BIS_fnc_selectRandom);" \n
+       "	if (_debug) then {  diag_log ""Civil Behavior :: Move random house""; };" \n
        "} else {" \n
-       "	if (_rand > 70) then {" \n
-       "		_destination = _house buildingPos (_house call dzn_fnc_getTotalBuildingPos);" \n
+       "	if (_rand > (100 - (dzn_civen_behavior_walkStandChance select 1))) then {" \n
+       "		_destination = ([_loc, ""area""] call dzn_fnc_civen_getLocProperty) call dzn_fnc_getRandomPointInZone;" \n
+       "		if (_debug) then {  diag_log ""Civil Behavior :: Move random point"";	};" \n
        "	} else {" \n
-       "		if (_rand > 35) then {" \n
-       "			#define GET_RANDOM_DIR_POINT	 [getPosASL _loc, random(359), _loc getVariable ""dist""] call dzn_fnc_getPosOnGivenDir" \n
-       "		" \n
-       "			_destination = GET_RANDOM_DIR_POINT;" \n
-       "			while {_destination call dzn_fnc_isInWater} do {" \n
-       "				_destination = GET_RANDOM_DIR_POINT;" \n
-       "			};" \n
-       "		} else {" \n
-       "			_destination = getPosASL _unit;" \n
-       "" \n
-       "			[" \n
-       "				_unit," \n
-       "				[""STAND_U1"",""STAND_U2"",""STAND_U3""] call BIS_fnc_selectRandom, " \n
-       "				""ASIS""" \n
-       "			] call BIS_fnc_ambientAnim;" \n
-       "" \n
-       "			_isAnim = true;" \n
-       "		};" \n
+       "		_destination = getPosASL _unit;" \n
+       "		[" \n
+       "			_unit," \n
+       "			[""STAND_U1"",""STAND_U2"",""STAND_U3""] call BIS_fnc_selectRandom, " \n
+       "			""ASIS""" \n
+       "		] call BIS_fnc_ambientAnim;" \n
+       "		_isAnim = true;" \n
+       "		if (_debug) then { diag_log ""Civil Behavior :: Stay "";};" \n
        "	};" \n
        "};" \n
        "" \n
@@ -160,7 +145,7 @@ class FSM
           priority = 0.000000;
           to="Danger";
           precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
-          condition=/*%FSM<CONDITION""">*/"!(_loc getVariable ""isSafe"")"/*%FSM</CONDITION""">*/;
+          condition=/*%FSM<CONDITION""">*/"!(_loc call dzn_fnc_civen_isLocationSafe)"/*%FSM</CONDITION""">*/;
           action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
         };
         /*%FSM</LINK>*/
@@ -185,7 +170,7 @@ class FSM
        "" \n
        "_timer = time + 60 + random(30);" \n
        "" \n
-       "_nearMen = (getPosASL _unit) nearEntities [[""Man""], 10];" \n
+       "_nearMen = (getPosASL _unit) nearEntities [[""Man""], 15];" \n
        "if !(_nearMen isEqualTo []) then {" \n
        "	_unit setFormDir ([_nearMen select 0, _unit] call BIS_fnc_dirTo);" \n
        "	if !(isPlayer (_nearMen select 0)) then {" \n
@@ -193,14 +178,16 @@ class FSM
        "	};" \n
        "};" \n
        "" \n
-       "" \n
        "[" \n
        "	_unit," \n
        "	[""STAND_U1"",""STAND_U2"",""STAND_U3""] call BIS_fnc_selectRandom, " \n
        "	""ASIS""" \n
        "] call BIS_fnc_ambientAnim;" \n
        "" \n
-       "_isAnim = true;"/*%FSM</STATEINIT""">*/;
+       "_isAnim = true;" \n
+       "" \n
+       "" \n
+       "diag_log ""Civil Behavior :: Reached the destination ""; "/*%FSM</STATEINIT""">*/;
       precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
       class Links
       {
@@ -220,7 +207,7 @@ class FSM
           priority = 0.000000;
           to="Danger";
           precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
-          condition=/*%FSM<CONDITION""">*/"!(_loc getVariable ""isSafe"")"/*%FSM</CONDITION""">*/;
+          condition=/*%FSM<CONDITION""">*/"!(_loc call dzn_fnc_civen_isLocationSafe)"/*%FSM</CONDITION""">*/;
           action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
         };
         /*%FSM</LINK>*/
@@ -230,18 +217,18 @@ class FSM
           priority = 0.000000;
           to="Safe";
           precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
-          condition=/*%FSM<CONDITION""">*/"(time > _timer) && (_loc getVariable ""isSafe"")"/*%FSM</CONDITION""">*/;
+          condition=/*%FSM<CONDITION""">*/"(time > _timer) && (_loc call dzn_fnc_civen_isLocationSafe)"/*%FSM</CONDITION""">*/;
           action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
         };
         /*%FSM</LINK>*/
       };
     };
     /*%FSM</STATE>*/
-    /*%FSM<STATE "Do_nothing">*/
-    class Do_nothing
+    /*%FSM<STATE "End">*/
+    class End
     {
-      name = "Do_nothing";
-      init = /*%FSM<STATEINIT""">*/""/*%FSM</STATEINIT""">*/;
+      name = "End";
+      init = /*%FSM<STATEINIT""">*/"if (_debug) then { player sideChat ""Civil Behavior :: END!! ""; };"/*%FSM</STATEINIT""">*/;
       precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
       class Links
       {
@@ -252,10 +239,11 @@ class FSM
     class Danger
     {
       name = "Danger";
-      init = /*%FSM<STATEINIT""">*/"_unit doMove (getPosASL (_unit getVariable ""home""));" \n
+      init = /*%FSM<STATEINIT""">*/"if (_isAnim) then { _unit call BIS_fnc_ambientAnim__terminate; };" \n
        "" \n
-       "_unit setBehaviour ""COMBAT"";" \n
-       "_unit setSpeedMode ""FULL"";"/*%FSM</STATEINIT""">*/;
+       "_unit call dzn_fnc_civen_switchToDanger;" \n
+       "" \n
+       "if (_debug) then { player sideChat ""Civil Behavior :: DANGER!! ""; };"/*%FSM</STATEINIT""">*/;
       precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
       class Links
       {
@@ -265,7 +253,7 @@ class FSM
           priority = 0.000000;
           to="Safe";
           precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
-          condition=/*%FSM<CONDITION""">*/"(time > _timer) && (_loc getVariable ""isSafe"")"/*%FSM</CONDITION""">*/;
+          condition=/*%FSM<CONDITION""">*/"(time > _timer) && (_loc call dzn_fnc_civen_isLocationSafe)"/*%FSM</CONDITION""">*/;
           action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
         };
         /*%FSM</LINK>*/
@@ -276,7 +264,7 @@ class FSM
   initState="Start";
   finalStates[] =
   {
-    "Do_nothing",
+    "End",
   };
 };
 /*%FSM</COMPILE>*/
