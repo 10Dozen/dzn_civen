@@ -1,54 +1,93 @@
-//	************** DZN_CIVEN PARAMETERS ******************
+if !(isServer || isDedicated) exitWith {};
 
-// Condition of initialization
-dzn_civen_conditionBeforeInit		=	"true";
+dzn_civen_initialized = false;
 
-// Delay before and after zones initializations
-dzn_civen_preInitTimeout			=	0;
-dzn_civen_afterInitTimeout			=	1;
+//  **************** SETTINGS ********************
 
-// Civilian population for city, town and village
-dzn_civen_cityPopulation 			=	20;
-dzn_civen_townPopulation			=	10;
-dzn_civen_villagePopulation			=	5;
+// Should be 100 in total
+dzn_civen_behavior_walkStandChance = [	
+	20 /* % Go to Random house */	
+	, 70 /* % Go to Random point */
+	, 20 /* % Stand on current pos */
+];
 
-// Size of locations for check
-dzn_civen_citySize					=	500;
-dzn_civen_townSize					=	200;
-dzn_civen_villageSize				=	100;
+// Seconds too return from DANGER to SAFE behavior
+dzn_civen_cooldownTimer			= 	30;
+
+// Parked vehicles global settings (values will be randomized from 0 to given max value, if ther is no vehoicleType specific)
+dzn_civen_parked_gFuelMax 		= 	0.7;
+dzn_civen_parked_gLockedChance		=	0.5;
+dzn_civen_parked_gDamage		=	0.3;	// 0 - no damage
+
+// To overwright vehcile type settings - set this ones to TRUE
+dzn_civen_parked_gFuelMaxForced		=	false;
+dzn_civen_parked_gLockedChanceForced	=	false;
+dzn_civen_parked_gDamageForced		=	false;
+
+// Traffic
+dzn_civen_allowTraffic			=	true;
+dzn_civen_trafficPerLocation		=	3;
+dzn_civen_trafficVehicleType		=	["VehicleType1"];	// Array of vehicle types (will be randomly chosed)
 
 
 
+//  **************** SETTINGS - MAPPINGS ********************
+// [ @Location (typeOf object or roleDescription), [ @CivilianType, @VehicleType, @VehiclesPerPopulation ] ]
+dzn_civen_locationSettings = [
+	[ 
+		"LocationCity_F",	
+		[ 
+			/* Civilian Type */	"CivilianType1"
+			/* Vehicle Type */	, "VehicleType1"
+			/* Vehicles Density */ 	, 0.3
+		] 
+	]
+	, [ 
+		"CustomTown1",	
+		[ 
+			/* Civilian Type */	"CivilianType1"
+			/* Vehicle Type */	, "VehicleType1"
+			/* Vehicles Density */ 	, 0.2 
+		] 
+	]
 
-//	**************	SERVER OR HEADLESS	*****************
-if ( entities "ModuleAnimals_F" isEqualTo [] ) exitWith {
-	player globalChat "Are you sure? There is no Animal Module on the map.";
+];
+
+// [ @CivilianTypename, [ @Classnames, @dzn_gear Kits, @Custom code to execute ] ]
+dzn_civen_civilianTypes = [
+	[
+		"CivilianType1"
+		, [
+			/* ClassNames */ 		["C_man_1", "C_man_polo_1_F_afro"]
+			/* Kits */			, []
+			/* Code to execute */ 		, { }
+		]
+	]
+
+];
+
+// [ @VehicleType, [ @Classnames, @dzn_gear Cargo kit, @Custom code to execute, @Fuel-Locked-Damage random] ]
+dzn_civen_vehicleTypes = [
+	[
+		"VehicleType1"
+		, [
+			["C_Offroad_01_F", "C_Hatchback_01_F","C_SUV_01_F"]	/* ClassNames */ 
+			, []				/* Kits */
+			, { }				/* Code to execute */
+			, [.7,.1,.1]			/* Fuel,Locked Chance,Damage, nil - if used global */
+		]
+	]
+];
+
+
+//  **************** INITIALIZATION ********************
+call compile preProcessFileLineNumbers "dzn_civen\fn\dzn_civen_functions.sqf";
+call compile preProcessFileLineNumbers "dzn_civen\fn\dzn_civen_behaviorFunctions.sqf";
+call compile preProcessFileLineNumbers "dzn_civen\fn\dzn_civen_trafficFunctions.sqf";
+
+// ***************** START ****************************
+
+[] spawn {
+	waitUntil { time > 5 };
+	[] call dzn_fnc_civen_initialize;
 };
-
-// If a player - exits script
-if (hasInterface && !isServer) exitWith {};
-
-// Get HC unit (Mission parameter "HeadlessClient" should be defined, see F3 Framework)
-if (("HeadlessClient" call BIS_fnc_GetParamValue) == 1) then {
-	// If Headless exists - server won't run script
-	if (isServer) exitWith {};
-};
-
-
-//	**************	INITIALIZATION *********************
-waitUntil { call compile dzn_civen_conditionBeforeInit };
-
-// Initialization of dzn_gear
-waitUntil { !isNil {dzn_gear_kitsInitialized} };
-
-// Initialization of dzn_dynai
-// call compile preProcessFileLineNumbers "dzn_civen\dzn_civen_customZones.sqf";
-// call compile preProcessFileLineNumbers "dzn_civen\dzn_civen_commonFunctions.sqf";
-call compile preProcessFileLineNumbers "dzn_civen\dzn_civen_functions.sqf";
-
-// ************** Start of DZN_DYNAI ********************
-waitUntil { time > dzn_civen_preInitTimeout };
-// call dzn_fnc_civen_initZones;
-
-waitUntil { time > dzn_civen_afterInitTimeout };
-// call dzn_fnc_civen_startZones;
