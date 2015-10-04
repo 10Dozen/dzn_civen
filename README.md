@@ -26,9 +26,15 @@ After town population created - traffic will be spawned too.
 #### Setting File
 See <tt>dzn_civen\dzn_civen_init.sqf</tt>.
 
+#### Location
+Locations where population should be spawned is fully user-defined. You can simply place any object from GameLogic-Locations or place any GameLogic object and set any custom name to <tt>Description</tt>.
+Location *should be* synchronized with triggers(1...n) and <tt>dzn_civen_core</tt> object.
+*Note:* It is better to place location object inside synchronized triggers area.
+
 #### Population
 
 **Population limit** can be defined via <tt>Azimuth</tt> control from editor menu. If you do not want to spawn any civilian - set value to negative (e.g. *-1*).
-Civilians have 2 behaviours: *safe* and *danger*. Behavior is the same for all civilians of one location. If anyone is shooting near civilians, location become *danger* - civilians are falling to the ground or start to running in panic. After time defined as <tt>dzn_civen_cooldownTimer</tt> 
+Civilians have 2 behaviours: *safe* and *danger*. Behavior is the same for all civilians of one location. If anyone is shooting near civilians, location become *danger* - civilians are falling to the ground or start to running in panic. After time defined as <tt>dzn_civen_cooldownTimer</tt> passed - location become *safe*. In *safe* state civilians can walk from street to street, enter buildings or simply stant and watch around.
+
 
 
