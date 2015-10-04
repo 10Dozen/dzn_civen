@@ -51,7 +51,7 @@ Civilians have 2 behaviours: *safe* and *danger*. Behavior is the same for all c
 
 #### Parked Vehicles
 **Quantity** of parked vehicles is defined in <tt>dzn_civen_locationSettings</tt> (density of parked vehicles). If no vehicles should be spawned - set density to 0.
-<br>Parked vehicles will be spawned at road sides. **Fuel**, **Damage** and **Locked chance** of the vehicle can be defined in <tt>dzn_civen_vehicleTypes</tt> settings or overwriten by <tt>dzn_civen_parked_gFuelMax</tt>, <tt>dzn_civen_parked_gLockedChance</tt>, <tt>dzn_civen_parked_gDamage</tt> settings (set <tt>dzn_civen_parked_gFuelMaxForced</tt>, <tt>dzn_civen_parked_gLockedChanceForced</tt>, <tt>dzn_civen_parked_gDamageForced</tt> variables to <tt>true</tt>). Given value is top value for random (e.g. Fuel = 0.5 means that vehicle's fuel can be from 0 to 0.5).
+<br>Parked vehicles will be spawned at road sides. **Fuel**, **Damage** and **Locked chance** of the vehicle can be defined in <tt>dzn_civen_vehicleTypes</tt> settings or overwriten by <tt>dzn_civen_parked_gFuelMax</tt>, <tt>dzn_civen_parked_gLockedChance</tt>, <tt>dzn_civen_parked_gDamage</tt> settings. Given value is top value for random (e.g. Fuel = 0.5 means that vehicle's fuel can be from 0 to 0.5).
 <br>**Vehicle Settings** are defined in <tt>**dzn_civen_vehicleTypes**</tt> array. Format of the array is next:
 <br> <tt>[ "VehicleType1", [	["C_Offroad_01_F", "C_Hatchback_01_F","C_SUV_01_F"], ["kit_civVehicle"], { }, [.7,.1,.1] ]</tt>
 <br>where:
@@ -61,10 +61,9 @@ Civilians have 2 behaviours: *safe* and *danger*. Behavior is the same for all c
 <br><tt>{ }</tt> - code which will be called for each created vehicle, *_this* will reffer to vehicle
 <br><tt>[.7,.1,.1]</tt> - *fuel*, *locked chance* and *damage* limits (for damage - 0 means no damage, 1 - destroyed)
 
-
-
-
-
-
-
-
+##### Traffic
+Traffic will created for each location - from location to all other locations. After vehicle reaches position of location object and there is no players near - vehicle and crew will be deleted and new traffic vehicle will be spawned instead. If vehicle stucked or cannot move anymore - it will be deleted too.
+<br>Next **options** are available:
+<br><tt>dzn_civen_allowTraffic</tt> - <tt>true</tt> to enable traffic between location, <tt>false</tt> to disable
+<br><tt>dzn_civen_trafficPerLocation</tt> - **quantity** of vehicles from each location (how many vehicles will move from each location to others)
+<br><tt>dzn_civen_trafficVehicleType</tt> - array of vehicle template names (for each vehicle will be chosen random classname from template from given templates)
