@@ -1,7 +1,7 @@
 # dzn_civen
 ### Dependencies
-- dzn_commonFunctions
-- dzn_gear
+- dzn_commonFunctions (https://github.com/10Dozen/dzn_commonFunctions)
+- dzn_gear (https://github.com/10Dozen/dzn_gear)
 <hr>
 
 ### How To
