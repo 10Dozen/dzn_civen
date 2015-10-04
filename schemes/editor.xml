@@ -1,9 +1,0 @@
-<GameLogic type="Logic" name="dzn_civen_core">
-	<synchronizedWith>dzn_civen_loc</synchronizedWith>
-	...
-</GameLogic>
-
-<GameLogic type="Logic" name="dzn_civen_loc%ANY%" attributes="{population: AZIMUT, type: roleDescription}">
-	<synchronizedWith>Trigger</synchronizedWith>
-	...
-</GameLogic>
