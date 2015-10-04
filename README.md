@@ -33,14 +33,14 @@ Location *should be* synchronized with triggers(1...n) and <tt>dzn_civen_core</t
 <br>**Location Settings** are defined in <tt>**dzn_civen_locationSettings**</tt> array. Format of the array is next:
 <br> <tt>[ "LocationCity_F",	[ "CivilianType1", "VehicleType1", 0.3	] ]</tt>
 <br>where:
-<br><tt>"LocationCity_F"</tt> - classname of the editor-placed GameLogic-Location, or custome name from <tt>Description</tt> field
+<br><tt>"LocationCity_F"</tt> - classname of the editor-placed GameLogic-Location, or custom name from <tt>Description</tt> field
 <br><tt>"CivilianType1"</tt> - name of the civilian template (see <tt>dzn_civen_civilianTypes</tt>)
 <br><tt>"VehicleType1"</tt> - name of the vehicles template (see <tt>dzn_civen_vehicleTypes</tt>)
 <br><tt>0.3</tt> - density of parked vehicle (quantity of parked vehicles per civilian - 0.3 means that there will be 3 parked vehicles per 10 spawned civilians)
 
 #### Population
 **Population limit** can be defined via <tt>Azimuth</tt> control from editor menu. If you do not want to spawn any civilian - set value to negative (e.g. *-1*).
-Civilians have 2 behaviours: *safe* and *danger*. Behavior is the same for all civilians of one location. If anyone is shooting near civilians, location become *danger* - civilians are falling to the ground or start to running in panic. After time defined as <tt>dzn_civen_cooldownTimer</tt> passed - location become *safe*. In *safe* state civilians can walk from street to street, enter buildings or simply stant and watch around.
+Civilians have 2 behaviours: *safe* and *danger*. Behavior is the same for all civilians of one location. If anyone is shooting near civilians, location become *danger* - civilians are falls to the ground or start to run in panic. After time, defined as <tt>dzn_civen_cooldownTimer</tt>, is passed - location become *safe*. In *safe* state civilians can walk from street to street, enter buildings or simply stant and watch around.
 <br>**Population Settings** are defined in <tt>**dzn_civen_civilianTypes**</tt> array. Format of the array is next:
 <br> <tt>[ "CivilianType1", [	["C_man_1", "C_man_polo_1_F_afro"], ["kit_civRandom"], { }	]</tt>
 <br>where:
@@ -62,8 +62,8 @@ Civilians have 2 behaviours: *safe* and *danger*. Behavior is the same for all c
 <br><tt>[.7,.1,.1]</tt> - *fuel*, *locked chance* and *damage* limits (for damage - 0 means no damage, 1 - destroyed)
 
 ##### Traffic
-Traffic will created for each location - from location to all other locations. After vehicle reaches position of location object and there is no players near - vehicle and crew will be deleted and new traffic vehicle will be spawned instead. If vehicle stucked or cannot move anymore - it will be deleted too.
+Traffic will be created for each location - from location to all other locations. After vehicle reaches position of location object and there is no players near - vehicle and crew will be deleted and new traffic vehicle will be spawned instead. If vehicle stucked or cannot move anymore - it will be deleted too.
 <br>Next **options** are available:
 <br><tt>dzn_civen_allowTraffic</tt> - <tt>true</tt> to enable traffic between location, <tt>false</tt> to disable
 <br><tt>dzn_civen_trafficPerLocation</tt> - **quantity** of vehicles from each location (how many vehicles will move from each location to others)
-<br><tt>dzn_civen_trafficVehicleType</tt> - array of vehicle template names (for each vehicle will be chosen random classname from template from given templates)
+<br><tt>dzn_civen_trafficVehicleType</tt> - array of vehicle template names (for each vehicle will be chosen *random classname* from *random template* from given templates)
