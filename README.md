@@ -3,6 +3,7 @@
 - dzn_commonFunctions
 - dzn_gear
 <hr>
+
 ### How To
 1. Place "GameLogic"-"Object"-"Game Logic" and name it - <tt>dzn_civen_core</tt> 
 2. Place "GameLogic"-"Locations"-"..." object (e.g. "Town") and copy classname of the object (e.g. "LocationCity_F")
