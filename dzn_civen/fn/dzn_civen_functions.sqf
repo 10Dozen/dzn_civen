@@ -265,7 +265,10 @@ dzn_fnc_civen_activateLocation = {
 		
 		_vClass = (_vType select 0) call BIS_fnc_selectRandom;
 		_s = if (random(2)>1) then { 1 } else { -1 };
-		_v = createVehicle [_vClass, (_road modelToWorld [7 * _s, 0, 0]),[], 0, "FORM"];
+		_v = createVehicle [_vClass, (_road modelToWorld [0, 0, 0]),[], 0, "FORM"];
+		_v allowDamage false;
+		
+		_v setPos (_road modelToWorld [7 * _s, 0, 0]);
 		
 		_dir = [
 			_road
