@@ -30,8 +30,8 @@ dzn_fnc_civen_setLocDanger = {
 	_this setVariable ["dzn_civen_isSafe", false];
 };
 
-dzn_fnc_civen_randmizeParkedVehicle = {
-	// [@Vehicle, @VehicleType Random Option (_vType select 3)] spawn dzn_fnc_civen_randmizeParkedVehicle
+dzn_fnc_civen_randomizeParkedVehicle = {
+	// [@Vehicle, @VehicleType Random Option (_vType select 3)] spawn dzn_fnc_civen_randomizeParkedVehicle
 	// Randomize according to settings
 	
 	params ["_v", "_opt"];
@@ -86,8 +86,13 @@ dzn_fnc_civen_initialize = {
 		
 		if (DEBUG) then { player sideChat format ["LOC %1: %2",  _loc, _locSettings]; };
 		
-		// Population
-		_locPopulation = if (getDir _loc > -1) then { floor(getDir _loc) - 2 } else { 0 };
+		// Population		
+		_locPopulation = 0;
+		if (!isNil {_loc getVariable "dzn_civen_population"}) then {
+			_locPopulation = _loc getVariable "dzn_civen_population";
+		} else {
+			_locPopulation = if (getDir _loc > -1) then { floor(getDir _loc) - 2 } else { 0 };
+		};
 		_loc setVariable [
 			"dzn_civen_population"
 			, _locPopulation
@@ -106,16 +111,22 @@ dzn_fnc_civen_initialize = {
 		];
 		
 		// Vehicle count
+		private _parkedCount = 0;
+		_parkedCount = if (!isNil {_loc getVariable "dzn_civen_parkedCount"}) then {
+			_loc getVariable "dzn_civen_parkedCount"
+		} else {
+			round ((_locSettings select 2) * _locPopulation)			
+		};
 		_loc setVariable [
 			"dzn_civen_vehicleCount"
-			, round ((_locSettings select 2) * _locPopulation)
+			, _parkedCount
 		];
 		
 		// Area
 		_area = [];
 		{
 			if (_x isKindOf "EmptyDetector") then {
-				_area pushBack ([_x, false] call dzn_fnc_convertTriggerToLocation	);
+				_area pushBack ([_x, false] call dzn_fnc_convertTriggerToLocation);
 			};
 		} forEach (synchronizedObjects _loc);
 		
@@ -129,7 +140,6 @@ dzn_fnc_civen_initialize = {
 		{
 			if (_x isKindOf "EmptyDetector") then { deleteVehicle _x; };
 		} forEach (synchronizedObjects _loc);
-		
 		
 		// Get area buildings
 		_loc setVariable [
@@ -161,6 +171,8 @@ dzn_fnc_civen_initialize = {
 		if (dzn_civen_allowTraffic) then {
 			_loc setVariable ["dzn_civen_currentTraffic", []];
 		};
+		
+		sleep 1;
 	} forEach (synchronizedObjects dzn_civen_core);
 	
 	// Traffic
@@ -215,7 +227,7 @@ dzn_fnc_civen_activateLocation = {
 	};
 	
 	for "_i" from 1 to _maxPopulation do {
-		sleep 0.6;
+		sleep 1;
 		_home = _buildings call BIS_fnc_selectRandom;
 		_uClass = (_pType select 0) call BIS_fnc_selectRandom;
 		_u = _locGroup createUnit [_uClass, _home buildingPos round(random 1), [], 0, "NONE"];
@@ -232,7 +244,7 @@ dzn_fnc_civen_activateLocation = {
 			[_u, (_pType select 1) call BIS_fnc_selectRandom] call dzn_fnc_gear_assignKit;
 		};
 		
-		// Custome Code
+		// Custom Code
 		_u call (_pType select 2);		
 		
 		// Listener of FiredNear
@@ -255,11 +267,10 @@ dzn_fnc_civen_activateLocation = {
 			};
 		};
 		[_u, _loc] execFSM "dzn_civen\FSM\dzn_civen_civilianBehavior.fsm";
-		
 	};
 	
 	for "_i" from 1 to _maxVehicles do {
-		sleep 0.3;
+		sleep 1;
 		_road = _roads call BIS_fnc_selectRandom;
 		_roads = _roads - [_road];
 		
@@ -288,7 +299,7 @@ dzn_fnc_civen_activateLocation = {
 		// Custom code
 		_v call (_vType select 2);
 		
-		[_v, _vType select 3] spawn dzn_fnc_civen_randmizeParkedVehicle;
+		[_v, _vType select 3] spawn dzn_fnc_civen_randomizeParkedVehicle;
 		_v spawn {
 			sleep 2;
 			_this allowDamage true;
