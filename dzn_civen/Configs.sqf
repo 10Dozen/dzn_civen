@@ -57,6 +57,14 @@ dzn_civen_civilianTypes = [
  *	Vehicles
  *
  *	[ @VehicleType, [ @Classnames, @dzn_gear Cargo kit, @Custom code to execute, @Fuel-Locked-Damage random] ]
+ *	@VehicleType		- (string) name of the type
+ *	@Classnames		- (array) list of the classnames for vehicles
+ *	@dzn_gear Cargo Kits	- (array) list of the dzn_gear cargo kits that will be applied randomly to spawned vehicles
+ *	@Custom code to execute	- (code) code that whill be executed once vehicle was spawned (use _this as refernece to vehicle itself)
+ *	@Fuel-Locked-Damage random	- (nil) or (array) in format [Max.fuel, Max.locked chance, Max.damage]. 
+ *						Random fuel, locked chance and damage will be applied to vehicle on spawn. 
+ *						If nil - global settings will be used.
+ *				
  */
 dzn_civen_vehicleTypes = [
 	[
