@@ -1,5 +1,16 @@
 //  **************** SETTINGS - MAPPINGS ********************
-// [ @Location (typeOf object or roleDescription), [ @CivilianType, @VehicleType, @VehiclesPerPopulation ] ]
+
+/*
+ *	Locations
+ *
+ *	[ @Location (typeOf object or roleDescription), [ @CivilianType, @VehicleType, @VehicleAmount ] ]
+ *	@Location 	- (string) classname or role description of the game logic
+ *	@CivilianType	- (string) name of the dzn_civen_civilianTypes item
+ *	@VehicleType	- (string) name of the dzn_civen_vehicleTypes item
+ *	@VehicleAmount	- (number) amount of parked vehicles per 1 location's civilian (e.g. 0.3 means that there will be 1 car per each 3 civilians)
+ *				or (array) in format [min, max] of vehicles per 1 location (e.g. [1,5] means that there will be spawned random from 1 to 5 cars, no matter how many civilians in location)
+ */
+ 
 dzn_civen_locationSettings = [
 	[ 
 		"LocationCity_F",	
@@ -19,7 +30,17 @@ dzn_civen_locationSettings = [
 	]
 ];
 
-// [ @CivilianTypename, [ @Classnames, @dzn_gear Kits, @Custom code to execute ] ]
+
+
+/*
+ *	Civilians
+ *
+ *	[ @CivilianTypename, [ @Classnames, @dzn_gear Kits, @Custom code to execute ] ]
+ *	@CivilianTypename	- (string) name of the type
+ *	@Classnames		- (array) list of the classnames for civilians units
+ *	@dzn_gear Kits		- (array) list of the dzn_gear kits that will be applied randomly to spawned units
+ *	@Custom code to execute	- (code) code that whill be executed once civilian unit was spawned (use _this as refernece to unit itself)
+ */
 dzn_civen_civilianTypes = [
 	[
 		"GreeceCivil"
@@ -32,7 +53,11 @@ dzn_civen_civilianTypes = [
 
 ];
 
-// [ @VehicleType, [ @Classnames, @dzn_gear Cargo kit, @Custom code to execute, @Fuel-Locked-Damage random] ]
+/*
+ *	Vehicles
+ *
+ *	[ @VehicleType, [ @Classnames, @dzn_gear Cargo kit, @Custom code to execute, @Fuel-Locked-Damage random] ]
+ */
 dzn_civen_vehicleTypes = [
 	[
 		"GreeceVehicles"
