@@ -1,3 +1,5 @@
+dzn_civen_InitTime			=	15; // seconds after mission start
+
 /*
  *	Town Civils
  */
