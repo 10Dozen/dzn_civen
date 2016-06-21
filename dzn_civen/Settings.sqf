@@ -16,6 +16,11 @@ dzn_civen_parked_gFuelMaxForced		=	false;
 dzn_civen_parked_gLockedChanceForced	=	false;
 dzn_civen_parked_gDamageForced		=	false;
 
+dzn_civen_behavior_walkStandChance = [	
+	20 /* % Go to Random house */	
+	, 70 /* % Go to Random point */
+	, 20 /* % Stand on current pos */
+];
 
 /*
  * 	Traffic
