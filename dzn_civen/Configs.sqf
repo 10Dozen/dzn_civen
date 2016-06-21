@@ -1,9 +1,3 @@
-dzn_civen_behavior_walkStandChance = [	
-	20 /* % Go to Random house */	
-	, 70 /* % Go to Random point */
-	, 20 /* % Stand on current pos */
-];
-
 //  **************** SETTINGS - MAPPINGS ********************
 // [ @Location (typeOf object or roleDescription), [ @CivilianType, @VehicleType, @VehiclesPerPopulation ] ]
 dzn_civen_locationSettings = [
@@ -32,7 +26,7 @@ dzn_civen_civilianTypes = [
 		, [
 			/* ClassNames */ 		["C_man_hunter_1_F"]
 			/* Kits */			, ["kit_civ_greece"]
-			/* Code to execute */ 	, { deleteVehicle _this; }
+			/* Code to execute */ 		, { }
 		]
 	]
 
