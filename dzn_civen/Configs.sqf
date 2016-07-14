@@ -3,32 +3,27 @@
 /*
  *	Locations
  *
- *	[ @Location (typeOf object or roleDescription), [ @CivilianType, @VehicleType, @VehicleAmount ] ]
+ *	[ @Location (typeOf object or roleDescription), [ @CivilianType, @CivilianAmount, @VehicleType, @VehicleAmount ] ]
  *	@Location 	- (string) classname or role description of the game logic
  *	@CivilianType	- (string) name of the dzn_civen_civilianTypes item
+ *	@CivilianAmount	- [] to use GameLogic settings, or [min,max] to get random
  *	@VehicleType	- (string) name of the dzn_civen_vehicleTypes item
  *	@VehicleAmount	- (number) amount of parked vehicles per 1 location's civilian (e.g. 0.3 means that there will be 1 car per each 3 civilians)
  *				or (array) in format [min, max] of vehicles per 1 location (e.g. [1,5] means that there will be spawned random from 1 to 5 cars, no matter how many civilians in location)
  */
  
 dzn_civen_locationSettings = [
-	[ 
-		"LocationCity_F",	
-		[ 
-			/* Civilian Type */	"GreeceCivil"
-			/* Vehicle Type */	, "GreeceVehicles"
-			/* Vehicles Density */ 	, 0.3
-		] 
+	[
+		"LocationCity_F",		["GreeceCivil", [], "GreeceVehicles", 0.3] 
 	]
 	,[ 
-		"LocationVillage_F",	
-		[ 
-			/* Civilian Type */	"GreeceCivil"
-			/* Vehicle Type */	, "GreeceVehicles"
-			/* Vehicles Density */ 	, 0
-		] 
+		"LocationVillage_F",	["GreeceCivil", [2,6], "GreeceVehicles", [1,3]] 
 	]
 ];
+
+
+
+
 
 
 
@@ -43,15 +38,14 @@ dzn_civen_locationSettings = [
  */
 dzn_civen_civilianTypes = [
 	[
-		"GreeceCivil"
-		, [
-			/* ClassNames */ 		["C_man_hunter_1_F"]
-			/* Kits */			, ["kit_civ_greece"]
-			/* Code to execute */ 		, { }
-		]
+		"GreeceCivil"		, [["C_man_hunter_1_F"], ["kit_civ_greece"], { }]
 	]
-
 ];
+
+
+
+
+
 
 /*
  *	Vehicles
