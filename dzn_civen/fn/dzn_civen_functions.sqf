@@ -109,6 +109,7 @@ dzn_fnc_civen_activateLocation = {
 				};
 			};
 			
+			_u setVariable ["dzn_civen_home",_home];
 			[_u, _loc] execFSM "dzn_civen\FSM\dzn_civen_civilianBehavior.fsm";
 		};			
 	};
