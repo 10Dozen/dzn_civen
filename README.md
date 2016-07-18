@@ -9,15 +9,14 @@
 ### How To
 1. Place "GameLogic"-"Object"-"Game Logic" and name it - <tt>dzn_civen_core</tt> 
 2. Place "GameLogic"-"Locations"-"..." object (e.g. "Town") and copy classname of the object (e.g. "LocationCity_F")
-3. Turn 'Azimuth' circle to set population of the area (or enter number)
-4. Synchronize GameLogic-Location to <tt>dzn_civen_core</tt>
-5. Place one or several triggers with default settings at your town area.
-6. Synchonize triggers with GameLogic-Location
-7. Open <tt>dzn_civen\dzn_civen_init.sqf</tt> file and set-up dzn_civen:
+3. Synchronize GameLogic-Location to <tt>dzn_civen_core</tt>
+4. Place one or several triggers with default settings at your town area.
+5. Synchonize triggers with GameLogic-Location
+6. Open <tt>dzn_civen\Settings.sqf</tt> file and set-up dzn_civen:
+7. Open <tt>dzn_civen\Configs.sqf</tt> file to set-up location, civilians and vehicle configuration:
 <br> - <tt>dzn_civen_locationSettings</tt> - array of settings for GameLogic-Location classname
 <br> - <tt>dzn_civen_civilianTypes</tt> - array of civilian template
 <br> - <tt>dzn_civen_vehicleTypes</tt> - array of civilian vehicles template
-<br> - <tt>Other settings</tt> - overall settings for behavior of civilians and parked civilian vehicles
 
 ## Overview
 
@@ -26,22 +25,21 @@ For each synchronized with <tt>dzn_civen_core</tt> objects - function will be sp
 After town population created - traffic will be spawned too.
 
 #### Setting File
-See <tt>dzn_civen\dzn_civen_init.sqf</tt>.
+See <tt>dzn_civen\Settings.sqf</tt> and <tt>dzn_civen\Configs.sqf</tt>.
 
 #### Location
 Locations where population should be spawned is fully user-defined. You can simply place any object from GameLogic-Locations or place any GameLogic object and set any custom name to <tt>Description</tt>.
 Location *should be* synchronized with triggers(1...n) and <tt>dzn_civen_core</tt> object.
-<br>*Note:* It is better to place location object inside synchronized triggers area.
 <br>**Location Settings** are defined in <tt>**dzn_civen_locationSettings**</tt> array. Format of the array is next:
-<br> <tt>[ "LocationCity_F",	[ "CivilianType1", "VehicleType1", 0.3	] ]</tt>
+<br> <tt>[ "LocationCity_F",	[ "CivilianType1", [1,6] "VehicleType1", [5,6]	] ]</tt>
 <br>where:
 <br><tt>"LocationCity_F"</tt> - classname of the editor-placed GameLogic-Location, or custom name from <tt>Description</tt> field
 <br><tt>"CivilianType1"</tt> - name of the civilian template (see <tt>dzn_civen_civilianTypes</tt>)
+<br><tt>[1,6]</tt> - min and max number of civilians per location (random will be chosen).
 <br><tt>"VehicleType1"</tt> - name of the vehicles template (see <tt>dzn_civen_vehicleTypes</tt>)
-<br><tt>0.3</tt> - density of parked vehicle (quantity of parked vehicles per civilian - 0.3 means that there will be 3 parked vehicles per 10 spawned civilians)
+<br><tt>0.3</tt> or <tt>[5,6]</tt> - quantity of parked vehicles per civilian - 0.3 means that there will be 3 parked vehicles per 10 spawned civilians OR min and max number of parked vehicles per locations.
 
 #### Population
-**Population limit** can be defined via <tt>Azimuth</tt> control from editor menu. If you do not want to spawn any civilian - set value to negative (e.g. *-1*).
 Civilians have 2 behaviours: *safe* and *danger*. Behavior is the same for all civilians of one location. If anyone is shooting near civilians, location become *danger* - civilians are falls to the ground or start to run in panic. After time, defined as <tt>dzn_civen_cooldownTimer</tt>, is passed - location become *safe*. In *safe* state civilians can walk from street to street, enter buildings or simply stant and watch around.
 <br>**Population Settings** are defined in <tt>**dzn_civen_civilianTypes**</tt> array. Format of the array is next:
 <br> <tt>[ "CivilianType1", [	["C_man_1", "C_man_polo_1_F_afro"], ["kit_civRandom"], { }	]</tt>
