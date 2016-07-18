@@ -90,7 +90,7 @@ dzn_fnc_civen_createTrafficElement = {
 	_dir = (if (isNil {_dir}) then { 0 } else { _dir });	
 	
 	private _vConfig = if (random 10 > 5) then {
-		GetLP(_loc, "vehicleType")
+		[dzn_civen_vehicleTypes, GetLP(_loc, "vehicleType")] call dzn_fnc_getValueByKey
 	} else {
 		( [dzn_civen_vehicleTypes, selectRandom dzn_civen_trafficVehicleType] call dzn_fnc_getValueByKey )		
 	};
@@ -101,16 +101,16 @@ dzn_fnc_civen_createTrafficElement = {
 	] call dzn_fnc_createVehicle;
 	
 	// Assign Cargo Gear
-	if !((_vehicleConfig select 1) isEqualTo []) then {
-		[_v, selectRandom (_vehicleConfig select 1), true] call dzn_fnc_gear_assignKit;
+	if !((_vConfig select 1) isEqualTo []) then {
+		[_v, selectRandom (_vConfig select 1), true] call dzn_fnc_gear_assignKit;
 	};
-	private _vSettings = (_vehicleConfig select 3);
+	private _vSettings = (_vConfig select 3);
 	[_v, [_vSettings select 0, 0, _vSettings select 0]] spawn dzn_fnc_civen_randomizeParkedVehicle;		
 	
 	/*
 		Vehicle crew
 	*/
-	private _uType = GetLP(_loc, "populationType");	
+	private _uType = [dzn_civen_civilianTypes, GetLP(_loc, "populationType")] call dzn_fnc_getValueByKey;	
 	private _grpSize = if (round(random 10) > 7) then { round(random 4) } else { 1 };
 	private _crew = [];			
 	for "_i" from 1 to _grpSize do {
@@ -125,7 +125,7 @@ dzn_fnc_civen_createTrafficElement = {
 		_u setCombatMode "GREEN";
 		
 		if !((_uType select 1) isEqualTo []) then {
-			[_u, selecRandom (_uType select 1)] call dzn_fnc_gear_assignKit;
+			[_u, selectRandom (_uType select 1)] call dzn_fnc_gear_assignKit;
 		};
 		
 		[
