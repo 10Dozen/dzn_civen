@@ -1,9 +1,11 @@
 if !(isServer || isDedicated) exitWith {};
 
 dzn_civen_initialized = false;
+dzn_civen_trafficGroup = createGroup civilian;
 
 //  **************** SETTINGS ********************
 call compile preProcessFileLineNumbers "dzn_civen\Settings.sqf";
+
 
 //  **************** INITIALIZATION ********************
 call compile preProcessFileLineNumbers "dzn_civen\Configs.sqf";
