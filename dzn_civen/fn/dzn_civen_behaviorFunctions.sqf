@@ -36,6 +36,19 @@ dzn_fnc_civen_switchToDanger = {
 	_this setCombatMode "RED";
 };
 
+dzn_fnc_civen_playIdleAnimation = {
+	// @True = @Unit call dzn_fnc_civen_playIdleAnimation
+	if (dzn_civen_enableIdleAnimation) then {
+		[
+			_this
+			, ["STAND_U1","STAND_U2","STAND_U3"] call BIS_fnc_selectRandom
+			, "ASIS"
+		] call BIS_fnc_ambientAnim;
+	};
+	
+	dzn_civen_enableIdleAnimation
+};
+
 dzn_fnc_civen_playAnimKeepLying = {
 	_this stop true;	
 	while { behaviour _this != "CARELESS" } do { 
