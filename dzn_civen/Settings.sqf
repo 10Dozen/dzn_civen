@@ -1,15 +1,16 @@
 /*
 	Timers
 */
-dzn_civen_InitTime				=	15; // seconds after mission start
-dzn_civen_UnitSpawnTimeout		= 	2;
-dzn_civen_ParkedSpawnTimeout	=	2;
+dzn_civen_InitTime				=	2; // seconds after mission start
+dzn_civen_UnitSpawnTimeout			= 	2;
+dzn_civen_ParkedSpawnTimeout			=	2;
 
 /*
  *	Town Civils
  */
-dzn_civen_allowCivils			= true; 
-dzn_civen_behavior_walkStandChance = [	
+dzn_civen_allowCivils			= false; 
+dzn_civen_enableIdleAnimation		= true;
+dzn_civen_behavior_walkStandChance 	= [	
 										20 /* % Go to Random house */	
 										, 70 /* % Go to Random point */
 										, 20 /* % Stand on current pos */
@@ -24,7 +25,7 @@ dzn_civen_cooldownTimer			= 	30;
  */
  
 dzn_civen_allowParkedVehicles				= true;
-dzn_civen_parked_forceAmountPerLocation		= true;	// Is qunatity of parked vehicles calculated according to population of area?
+dzn_civen_parked_forceAmountPerLocation		= false;	// Is qunatity of parked vehicles calculated according to population of area?
 dzn_civen_parked_forceAmountLimit			= [1,3]; // Min and max amount of parked vehicles per location
  
 // Parked vehicles global settings (values will be randomized from 0 to given max value, if ther is no vehoicleType specific)
@@ -43,6 +44,6 @@ dzn_civen_parked_gDamage				=	0.3;
 /*
  * 	Traffic
  */
-dzn_civen_allowTraffic				=	true;
+dzn_civen_allowTraffic				=	false;
 dzn_civen_trafficPerLocation		=	3;
 dzn_civen_trafficVehicleType		=	["GreeceVehicles"];	// Array of vehicle types (will be randomly chosed)
