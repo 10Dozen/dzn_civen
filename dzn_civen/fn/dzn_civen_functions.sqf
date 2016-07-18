@@ -135,15 +135,12 @@ dzn_fnc_civen_activateLocation = {
 					(roadsConnectedTo _road) select 0	
 				}
 			] call BIS_fnc_DirTo;		
-			
+			_dir = if (isNil {_dir}) then { 0 } else { _dir };
 			
 			private _v = [
-				(_road modelToWorld [0, 0, 0])
+				[(_road modelToWorld [7 * _s, 0, 0]), _dir]
 				, selectRandom (_vehicleConfig select 0)
-			] call dzn_fnc_createVehicle;			
-			
-			_v setPos (_road modelToWorld [7 * _s, 0, 0]);
-			_v setDir (if (isNil {_dir}) then { 0 } else { _dir });
+			] call dzn_fnc_createVehicle;
 			
 			// Assign Cargo Gear
 			if !((_vehicleConfig select 1) isEqualTo []) then {
