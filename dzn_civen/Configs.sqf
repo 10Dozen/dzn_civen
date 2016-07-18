@@ -14,10 +14,10 @@
  
 dzn_civen_locationSettings = [
 	[
-		"LocationCity_F",		["GreeceCivil", [], "GreeceVehicles", 0.3] 
+		"LocationCity_F",		["GreeceCivil", [2,6], "GreeceVehicles", [6,10]] 
 	]
 	,[ 
-		"LocationVillage_F",	["GreeceCivil", [2,6], "GreeceVehicles", [1,3]] 
+		"LocationVillage_F",	["GreeceCivil", [2,6], "GreeceVehicles", [6,13]] 
 	]
 ];
 
@@ -65,36 +65,22 @@ dzn_civen_vehicleTypes = [
 		"GreeceVehicles"
 		, [
 			[
-				"CUP_C_Golf4_black_Civ"
-				,"CUP_C_Golf4_camodark_Civ"
-				,"CUP_C_Golf4_kitty_Civ"
-				,"CUP_C_Golf4_crowe_Civ"
-				,"CUP_C_Golf4_red_Civ"
-				,"CUP_C_Golf4_white_Civ"
-				,"CUP_C_Golf4_yellow_Civ"
-				
+				"C_Hatchback_01_F"
+				,"C_Offroad_01_F"				
+				,"C_SUV_01_F"
 				,"C_Hatchback_01_F"
 				,"C_Offroad_01_F"				
 				,"C_SUV_01_F"
-				,"CUP_C_Octavia_CIV"
-				,"CUP_C_SUV_CIV"
-				,"C_Hatchback_01_F"
-				,"C_Offroad_01_F"				
-				,"C_SUV_01_F"
-				,"CUP_C_Octavia_CIV"
-				,"CUP_C_SUV_CIV"
-				
 				,"C_Van_01_box_F"
 				,"C_Van_01_transport_F"
 				,"C_Van_01_box_F"
-				,"C_Van_01_transport_F"
-				
+				,"C_Van_01_transport_F"				
 				,"C_Truck_02_transport_F"
 				,"C_Truck_02_covered_F"
 				,"C_Offroad_01_repair_F"
 				
 			]	/* ClassNames */ 
-			, []				/* Kits */
+			, ["kit_greece_vehicle","kit_greece_vehicle2"]				/* Kits */
 			, { }				/* Code to execute */
 			, [.7,.5,.2]			/* Fuel,Locked Chance,Damage, nil - if used global */
 		]
