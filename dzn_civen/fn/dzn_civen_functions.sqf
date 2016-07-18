@@ -50,8 +50,8 @@ dzn_fnc_civen_activateLocation = {
 		Spawn population
 	*/
 	private _maxPopulation = GetLP(_loc,"population");
-	if (_maxPopulation > 0) then {
-		private _populationType = GetLP(_loc,"populationType");
+	if (_maxPopulation > 0) then {	
+		private _populationConfig = [dzn_civen_civilianTypes, GetLP(_loc,"populationType")] call dzn_fnc_getValueByKey;
 		private _buildings = GetLP(_loc,"buildings");
 	
 		private _group = createGroup civilian;
@@ -64,11 +64,10 @@ dzn_fnc_civen_activateLocation = {
 		for "_i" from 1 to _maxPopulation do {
 			sleep dzn_civen_UnitSpawnTimeout;
 			
-			private _home = _buildings call BIS_fnc_selectRandom;
-			private _unitClass = (_populationType select 0) call BIS_fnc_selectRandom;
+			private _home = selectRandom _buildings;
 			
 			private _u = _group createUnit [
-				(_populationType select 0) call BIS_fnc_selectRandom
+				selectRandom (_populationConfig select 0)
 				, _home buildingPos round(random 1)
 				,[]
 				,0
@@ -81,12 +80,12 @@ dzn_fnc_civen_activateLocation = {
 			_u disableAI "FSM";
 			
 			// Assign gear
-			if !((_populationType select 1) isEqualTo []) then {
-				[_u, (_populationType select 1) call BIS_fnc_selectRandom] call dzn_fnc_gear_assignKit;
+			if !((_populationConfig select 1) isEqualTo []) then {
+				[_u, selectRandom (_populationConfig select 1)] call dzn_fnc_gear_assignKit;
 			};
 			
 			// Custom Code
-			_u call (_populationType select 2);		
+			_u call (_populationConfig select 2);		
 			
 			// Listener of FiredNear
 			private _isEHListener = false;
@@ -101,7 +100,7 @@ dzn_fnc_civen_activateLocation = {
 				_unit allowDamage true;
 				
 				sleep 15;
-				if (_isListener) then {
+				if (_isListener && dzn_civen_enableUnsafeBehaviour) then {
 					_unit setVariable ["dzn_civen_homeLocation", _loc];
 					_unit addeventhandler ['FiredNear', {
 						(_unit getVariable "dzn_civen_homeLocation") call dzn_fnc_civen_setLocDanger;
@@ -119,14 +118,14 @@ dzn_fnc_civen_activateLocation = {
 	*/
 	private _maxVehicles = GetLP(_loc,"vehicleCount");
 	if (_maxVehicles > 0) then {
-		private _vehicleType = GetLP(_loc,"vehicleType");
+		private _vehicleConfig = [dzn_civen_vehicleTypes, GetLP(_loc,"vehicleType")] call dzn_fnc_getValueByKey;
 		private _roads = GetLP(_loc,"roads");
 		
 		for "_i" from 1 to _maxVehicles do {
 			sleep dzn_civen_ParkedSpawnTimeout;
 			
 			private _s = if (random(2)>1) then { 1 } else { -1 };
-			private _road = _roads call BIS_fnc_selectRandom;
+			private _road = selectRandom _roads;
 			_roads = _roads - [_road];
 			private _dir = [
 				_road
@@ -138,31 +137,23 @@ dzn_fnc_civen_activateLocation = {
 			] call BIS_fnc_DirTo;		
 			
 			
-			private _vehicleClass = (_vehicleType select 0) call BIS_fnc_selectRandom;			
-			private _v = createVehicle [
-				(_vehicleType select 0) call BIS_fnc_selectRandom
-				, (_road modelToWorld [0, 0, 0])
-				,[]
-				,0
-				,"FORM"
-			];
-			_v allowDamage false;			
+			private _v = [
+				(_road modelToWorld [0, 0, 0])
+				, selectRandom (_vehicleConfig select 0)
+			] call dzn_fnc_createVehicle;			
+			
 			_v setPos (_road modelToWorld [7 * _s, 0, 0]);
 			_v setDir (if (isNil {_dir}) then { 0 } else { _dir });
 			
 			// Assign Cargo Gear
-			if !((_vehicleType select 1) isEqualTo []) then {
-				[_v, (_vehicleType select 1) call BIS_fnc_selectRandom, true] call dzn_fnc_gear_assignKit;
+			if !((_vehicleConfig select 1) isEqualTo []) then {
+				[_v, selectRandom (_vehicleConfig select 1), true] call dzn_fnc_gear_assignKit;
 			};
 			
 			// Custom code
-			_v call (_vehicleType select 2);
+			_v call (_vehicleConfig select 2);
 			
-			[_v, _vehicleType select 3] spawn dzn_fnc_civen_randomizeParkedVehicle;
-			_v spawn {
-				sleep 2;
-				_this allowDamage true;
-			};	
+			[_v, _vehicleConfig select 3] spawn dzn_fnc_civen_randomizeParkedVehicle;			
 		};
 	};
 	
@@ -207,13 +198,8 @@ dzn_fnc_civen_randomizeParkedVehicle = {
 	Initialization
 */
 
-dzn_fnc_civen_initialize = {
-	if (isNil "dzn_civen_core") exitWith {
-		["DZN CIVEN: There is no 'dzn_civen_core' GameLogic exists."] call BIS_fnc_error; 
-	};
-	if ((synchronizedObjects dzn_civen_core) isEqualTo []) exitWith {
-		["DZN CIVEN: There is no synchronized to 'dzn_civen_core' GameLogics."] call BIS_fnc_error;
-	};
+dzn_fnc_civen_initLocation = {
+	params["_loc"];
 	
 	_getRandom = {
 		round( random [
@@ -224,121 +210,131 @@ dzn_fnc_civen_initialize = {
 	}
 	_getRange = {
 		if (_this isEqualTo []) then { [0,0] } else { _this }	
+	};	
+	
+	// Get Settings	-- in format ["GreeceCivil", [] or [2,5], "GreeceVehicles", 0.3 or [2,5]] 
+	private _locSettings = if (roleDescription _loc == "") then {
+		[dzn_civen_locationSettings, typeOf _loc] call dzn_fnc_getValueByKey
+	} else {
+		[dzn_civen_locationSettings, _loc getVariable "dzn_civen_configName"] call dzn_fnc_getValueByKey
+	};
+	IF_DEBUG(player sideChat format ["LOC %1: %2",  _loc, _locSettings]);
+	
+	/*
+		Get Population		- format X (Number)
+		a) from GameLogic parameter
+		b) from Config parameter
+	*/
+	private _population = 0;
+	
+	if (!isNil {_loc getVariable "dzn_civen_population"}) then {
+		_population = ( (_loc getVariable "dzn_civen_population") call _getRange ) call _getRandom;
+	} else {
+		_population = ( (_locSettings select 1)  call _getRange ) call _getRandom;
+	};	
+	_population = round(_population);
+	
+	/*
+		Get Population type	- format "Population_ConfigName"
+		a) from GameLogic parameter
+		b) from Config parameter
+	*/
+	private _populationType = "";
+	if (!isNil {_loc getVariable "dzn_civen_populationType"}) then {
+		_populationType = _loc getVariable "dzn_civen_populationType";
+	} else {
+		_populationType = _locSettings select 0;
 	};
 	
-	{
-		private _loc = _x;
+	/*
+		Get Vehicle amount		- format X (Number)
+		a) global if forced
+		b) from GameLogic parameter
+		c) from Config parameter
 		
-		// Get Settings
-		private _locSettings = if (roleDescription _loc == "") then {
-			[dzn_civen_locationSettings, typeOf _loc] call dzn_fnc_getValueByKey
-		} else {
-			[dzn_civen_locationSettings, roleDescription _loc] call dzn_fnc_getValueByKey
-		};
-		IF_DEBUG(player sideChat format ["LOC %1: %2",  _loc, _locSettings]);
-		
-		/*
-			Get Population		
-			a) from GameLogic parameter
-			b) from Config parameter
-		*/
-		private _population = 0;
-		
-		if (!isNil {_loc getVariable "dzn_civen_population"}) then {
-			_population = ( (_loc getVariable "dzn_civen_population") call _getRange ) call _getRandom;
-		} else {
-			_population = ( (_locSettings select 1)  call _getRange ) call _getRandom;
-		};		
-		_population = round(_population);
-		
-		/*
-			Get Population type
-			a) from GameLogic parameter
-			b) from Config parameter
-		*/
-		private _populationType = [];
-		if (!isNil {_loc getVariable "dzn_civen_populationType"}) then {
-			_populationType = _loc getVariable "dzn_civen_populationType";
-		} else {
-			_populationType = [dzn_civen_civilianTypes, _locSettings select 0] call dzn_fnc_getValueByKey;
-		};
-		
-		/*
-			Get Vehicle amount		
-			a) global if forced
-			b) from GameLogic parameter
-			c) from Config parameter
-			
-		*/
-		private _parkedCount = 0;
-		if (dzn_civen_parked_forceAmountPerLocation) then {
-			_parkedCount = ( dzn_civen_parked_forceAmountLimit call _getRange ) call _getRandom;		
-		} else {
-			if (!isNil {_loc getVariable "dzn_civen_parkedCount"}) then {
-				_parkedCount = ( (_loc getVariable "dzn_civen_parkedCount") call _getRange ) call _getRandom;	
-			} else {				
-				if (typename (_locSettings select 3) == "ARRAY") then { 
-					_parkedCount = ( (_locSettings select 3) call _getRange ) call _getRandom;	
-				} else {
-					_parkedCount = round(_locSettings select 3) * _population;
-				};
-			};		
-		};
-		_parkedCount = round(_parkedCount);
-		
-		
-		/*
-			Get Vehicle type
-			a) from GameLogic parameter
-			b) from Config parameter
-		*/	
-		private _vehicleType = [];
-		if (!isNil {_loc getVariable "dzn_civen_vehicleType"}) then {
-			_vehicleType = _loc getVariable "dzn_civen_vehicleType";
-		} else {
-			_vehicleType = [ dzn_civen_vehicleTypes, _locSettings select 1] call dzn_fnc_getValueByKey;
-		};		
-		
-		/*
-			Get Area
-		*/		
-		private _area = [];		
-		private _areaTrgs = synchronizedObjects _loc;
-		{
-			if (_x isKindOf "EmptyDetector") then {
-				_area pushBack ([_x, true] call dzn_fnc_convertTriggerToLocation);
+	*/
+	private _parkedCount = 0;
+	if (dzn_civen_parked_forceAmountPerLocation) then {
+		_parkedCount = ( dzn_civen_parked_forceAmountLimit call _getRange ) call _getRandom;	
+	} else {
+		if (!isNil {_loc getVariable "dzn_civen_parkedCount"}) then {
+			_parkedCount = ( (_loc getVariable "dzn_civen_parkedCount") call _getRange ) call _getRandom;	
+		} else {		
+			if (typename (_locSettings select 3) == "ARRAY") then { 
+				_parkedCount = ( (_locSettings select 3) call _getRange ) call _getRandom;	
+			} else {
+				_parkedCount = round(_locSettings select 3) * _population;
 			};
-		} forEach _areaTrgs;	
-		IF_DEBUG(player sideChat format ["LOC %1: dzn_civen_area: %2", _loc, _area]);			
-		IF_DEBUG(player sideChat format ["LOC AREA POS: %1", _area call dzn_fnc_getZonePosition]);
-			
-		/*
-			Set up Location properties
-		*/
-		{
-			_loc setVariable [_x select 0, _x select 1];
-		} forEach [
-			["dzn_civen_population", _population]
-			,["dzn_civen_populationType", _populationType]
-			,["dzn_civen_vehicleCount", _parkedCount]
-			,["dzn_civen_vehicleType", _vehicleType]
-			,["dzn_civen_area", _area]
-			,["dzn_civen_areaPos",  _area call dzn_fnc_getZonePosition]
-			,["dzn_civen_buildings", [_area] call dzn_fnc_getLocationBuildings]
-			,["dzn_civen_roads", _area call dzn_fnc_getLocationRoads]
-			,["dzn_civen_isSafe", true]
-			,["dzn_civen_dangerTimestamp", 0]
-		];
-		
-		// If no 'isActive' or 'isActive' == true - run activate location.
-		if (_loc getVariable ["dzn_civen_isActive", false]) then {
-			_loc spawn dzn_fnc_civen_activateLocation;
+		};	
+	};
+	_parkedCount = round(_parkedCount);
+	
+	
+	/*
+		Get Vehicle type		- format 'VehicleType_Config_Name'
+		a) from GameLogic parameter
+		b) from Config parameter
+	*/	
+	private _vehicleType = "";
+	if (!isNil {_loc getVariable "dzn_civen_vehicleType"}) then {
+		_vehicleType = _loc getVariable "dzn_civen_vehicleType";
+	} else {
+		_vehicleType = _locSettings select 2;
+	};	
+	
+	/*
+		Get Area
+	*/	
+	private _area = [];	
+	private _areaTrgs = synchronizedObjects _loc;
+	{
+		if (_x isKindOf "EmptyDetector") then {
+			_area pushBack ([_x, true] call dzn_fnc_convertTriggerToLocation);
 		};
+	} forEach _areaTrgs;	
+	IF_DEBUG(player sideChat format ["LOC %1: dzn_civen_area: %2", _loc, _area]);		
+	IF_DEBUG(player sideChat format ["LOC AREA POS: %1", _area call dzn_fnc_getZonePosition]);
 		
-		if (dzn_civen_allowTraffic) then {
-			_loc setVariable ["dzn_civen_currentTraffic", []];
-		};
-		
+	/*
+		Set up Location properties
+	*/
+	{
+		_loc setVariable [_x select 0, _x select 1];
+	} forEach [
+		["dzn_civen_population"			, _population]
+		,["dzn_civen_populationType"	, _populationType]
+		,["dzn_civen_vehicleCount"		, _parkedCount]
+		,["dzn_civen_vehicleType"		, _vehicleType]
+		,["dzn_civen_area"				, _area]
+		,["dzn_civen_areaPos"			,  _area call dzn_fnc_getZonePosition]
+		,["dzn_civen_buildings"			, [_area] call dzn_fnc_getLocationBuildings]
+		,["dzn_civen_roads"				, _area call dzn_fnc_getLocationRoads]
+		,["dzn_civen_isSafe"			, true]
+		,["dzn_civen_dangerTimestamp"	, 0]
+	];
+	
+	// If no 'isActive' or 'isActive' == true - run activate location.
+	if (_loc getVariable ["dzn_civen_isActive", false]) then {
+		_loc spawn dzn_fnc_civen_activateLocation;
+	};
+	
+	if (dzn_civen_allowTraffic) then {
+		_loc setVariable ["dzn_civen_currentTraffic", []];
+	};	
+}
+
+
+
+dzn_fnc_civen_initialize = {
+	if (isNil "dzn_civen_core") exitWith {
+		["DZN CIVEN: There is no 'dzn_civen_core' GameLogic exists."] call BIS_fnc_error; 
+	};
+	if ((synchronizedObjects dzn_civen_core) isEqualTo []) exitWith {
+		["DZN CIVEN: There is no synchronized to 'dzn_civen_core' GameLogics."] call BIS_fnc_error;
+	};	
+	
+	{
+		_x call dzn_fnc_civen_initLocation;		
 		sleep 2;
 	} forEach (synchronizedObjects dzn_civen_core);
 	
