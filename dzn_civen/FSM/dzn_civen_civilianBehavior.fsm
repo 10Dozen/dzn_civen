@@ -1,9 +1,9 @@
 /*%FSM<COMPILE "D:\GMZ\BI Toolz\FSM Editor Personal Edition\scriptedFSM.cfg, dzn_civen_civilianBehaviour">*/
 /*%FSM<HEAD>*/
 /*
-item0[] = {"Start",0,4346,-50.000000,-1225.000000,50.000000,-1175.000000,0.000000,"Start"};
+item0[] = {"Start",0,250,-50.000000,-1225.000000,50.000000,-1175.000000,0.000000,"Start"};
 item1[] = {"is_Safe",4,218,-50.000000,-1150.000000,50.000000,-1100.000000,0.000000,"is Safe"};
-item2[] = {"Safe",2,250,-50.000000,-1050.000000,50.000000,-1000.000000,0.000000,"Safe"};
+item2[] = {"Safe",2,4346,-50.000000,-1050.000000,50.000000,-1000.000000,0.000000,"Safe"};
 item3[] = {"Can_walk",4,218,-50.000000,-950.000000,50.000000,-900.000000,0.000000,"Can walk"};
 item4[] = {"Get_place_to__mo",2,250,-50.000000,-875.000000,50.000000,-825.000000,0.000000,"Get place to " \n "move"};
 item5[] = {"Wait_for_reach",4,218,150.000000,-875.000000,250.000000,-825.000000,0.000000,"Wait for reach"};
@@ -27,7 +27,7 @@ link11[] = {7,9};
 link12[] = {8,10};
 link13[] = {10,1};
 globals[] = {25.000000,1,0,0,16777215,640,480,1,253,6316128,1,-208.593872,363.468292,-672.503418,-1265.206543,536,701,1};
-window[] = {0,-1,-1,-32000,-32000,1143,-17,1434,297,1,554};
+window[] = {0,-1,-1,-1,-1,946,100,1551,100,1,554};
 *//*%FSM</HEAD>*/
 class FSM
 {
@@ -85,7 +85,7 @@ class FSM
           priority = 0.000000;
           to="End";
           precondition = /*%FSM<CONDPRECONDITION""">*/""/*%FSM</CONDPRECONDITION""">*/;
-          condition=/*%FSM<CONDITION""">*/"!(canStand _unit) && (time > _timer)"/*%FSM</CONDITION""">*/;
+          condition=/*%FSM<CONDITION""">*/"( (!alive _unit) || !(canStand _unit) ) && {time > _timer}"/*%FSM</CONDITION""">*/;
           action=/*%FSM<ACTION""">*/""/*%FSM</ACTION""">*/;
         };
         /*%FSM</LINK>*/
@@ -118,19 +118,17 @@ class FSM
        "" \n
        "if (_rand > (100 - (dzn_civen_behavior_walkStandChance select 0))) then {" \n
        "	_destination = _house buildingPos ((_house call dzn_fnc_getHousePositions) call BIS_fnc_selectRandom);" \n
+       "" \n
        "	if (_debug) then {  diag_log ""Civil Behavior :: Move random house""; };" \n
        "} else {" \n
        "	if (_rand > (100 - (dzn_civen_behavior_walkStandChance select 1))) then {" \n
        "		_destination = ([_loc, ""area""] call dzn_fnc_civen_getLocProperty) call dzn_fnc_getRandomPointInZone;" \n
+       "" \n
        "		if (_debug) then {  diag_log ""Civil Behavior :: Move random point"";	};" \n
        "	} else {" \n
-       "		_destination = getPosASL _unit;" \n
-       "		[" \n
-       "			_unit," \n
-       "			[""STAND_U1"",""STAND_U2"",""STAND_U3""] call BIS_fnc_selectRandom, " \n
-       "			""ASIS""" \n
-       "		] call BIS_fnc_ambientAnim;" \n
-       "		_isAnim = true;" \n
+       "		_destination = getPosASL _unit;		" \n
+       "		_isAnim = _unit call dzn_fnc_civen_playIdleAnimation;" \n
+       "" \n
        "		if (_debug) then { diag_log ""Civil Behavior :: Stay "";};" \n
        "	};" \n
        "};" \n
@@ -178,14 +176,7 @@ class FSM
        "	};" \n
        "};" \n
        "" \n
-       "[" \n
-       "	_unit," \n
-       "	[""STAND_U1"",""STAND_U2"",""STAND_U3""] call BIS_fnc_selectRandom, " \n
-       "	""ASIS""" \n
-       "] call BIS_fnc_ambientAnim;" \n
-       "" \n
-       "_isAnim = true;" \n
-       "" \n
+       "_isAnim = _unit call dzn_fnc_civen_playIdleAnimation;" \n
        "" \n
        "diag_log ""Civil Behavior :: Reached the destination ""; "/*%FSM</STATEINIT""">*/;
       precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
