@@ -100,16 +100,19 @@ dzn_fnc_civen_createTrafficElement = {
 		, selectRandom (_vConfig select 0)
 	] call dzn_fnc_createVehicle;
 	
+	// Assign Cargo Gear
+	if !((_vehicleConfig select 1) isEqualTo []) then {
+		[_v, selectRandom (_vehicleConfig select 1), true] call dzn_fnc_gear_assignKit;
+	};
+	private _vSettings = (_vehicleConfig select 3);
+	[_v, [_vSettings select 0, 0, _vSettings select 0]] spawn dzn_fnc_civen_randomizeParkedVehicle;		
+	
 	/*
 		Vehicle crew
 	*/
-	private _grpSize = if (round(random 10) > 7) then { round(random 4) } else { 1 };
-	private _crew = [];
-	
 	private _uType = GetLP(_loc, "populationType");	
-	private _uClass = selectRandom (_uType select 0);
-	private _uKit = selecRandom (_uType select 1);
-	
+	private _grpSize = if (round(random 10) > 7) then { round(random 4) } else { 1 };
+	private _crew = [];			
 	for "_i" from 1 to _grpSize do {
 		private _u = dzn_civen_trafficGroup createUnit [selectRandom (_uType select 0), [0,0,0], [], 0, "NONE"];
 		_u allowDamage false;
@@ -208,4 +211,8 @@ dzn_fnc_civen_excludeTrafficElement = {
 		, (_loc getVariable "dzn_civen_currentTraffic") - [_this]
 	];
 };
+
+
+
+
 
