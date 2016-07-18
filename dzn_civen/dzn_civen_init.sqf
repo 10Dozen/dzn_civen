@@ -5,7 +5,6 @@ dzn_civen_initialized = false;
 //  **************** SETTINGS ********************
 call compile preProcessFileLineNumbers "dzn_civen\Settings.sqf";
 
-
 //  **************** INITIALIZATION ********************
 call compile preProcessFileLineNumbers "dzn_civen\Configs.sqf";
 call compile preProcessFileLineNumbers "dzn_civen\fn\dzn_civen_functions.sqf";
