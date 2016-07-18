@@ -16,6 +16,7 @@ dzn_civen_behavior_walkStandChance = [
 									];
 
 // Seconds too return from DANGER to SAFE behavior
+dzn_civen_enableUnsafeBehaviour	=	true;
 dzn_civen_cooldownTimer			= 	30;
 
 /*
