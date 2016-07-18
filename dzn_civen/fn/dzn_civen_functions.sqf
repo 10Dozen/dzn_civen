@@ -1,4 +1,4 @@
-#define DEBUG								false
+#define DEBUG								true
 
 #define IF_DEBUG(X)							if (DEBUG) then { X; }
 #define GetLP(LOC,PROP)						[LOC, PROP] call dzn_fnc_civen_getLocProperty
@@ -45,12 +45,13 @@ dzn_fnc_civen_setLocDanger = {
 dzn_fnc_civen_activateLocation = {
 	// @Location spawn dzn_fnc_civen_activateLocation
 	params ["_loc"];
+	if (_loc getVariable ["dzn_civen_isActive", false]) exitWith {};
 	
 	/*
 		Spawn population
 	*/
 	private _maxPopulation = GetLP(_loc,"population");
-	if (_maxPopulation > 0) then {	
+	if (_maxPopulation > 0 && dzn_civen_allowCivils) then {	
 		private _populationConfig = [dzn_civen_civilianTypes, GetLP(_loc,"populationType")] call dzn_fnc_getValueByKey;
 		private _buildings = GetLP(_loc,"buildings");
 	
@@ -103,7 +104,8 @@ dzn_fnc_civen_activateLocation = {
 				if (_isListener && dzn_civen_enableUnsafeBehaviour) then {
 					_unit setVariable ["dzn_civen_homeLocation", _loc];
 					_unit addeventhandler ['FiredNear', {
-						(_unit getVariable "dzn_civen_homeLocation") call dzn_fnc_civen_setLocDanger;
+					player sideChat "SHOOTING!!!";
+						((_this select 0) getVariable "dzn_civen_homeLocation") call dzn_fnc_civen_setLocDanger;
 					}];
 				};
 			};
@@ -117,7 +119,7 @@ dzn_fnc_civen_activateLocation = {
 		Spawn vehicle
 	*/
 	private _maxVehicles = GetLP(_loc,"vehicleCount");
-	if (_maxVehicles > 0) then {
+	if (_maxVehicles > 0 && dzn_civen_allowParkedVehicles) then {
 		private _vehicleConfig = [dzn_civen_vehicleTypes, GetLP(_loc,"vehicleType")] call dzn_fnc_getValueByKey;
 		private _roads = GetLP(_loc,"roads");
 		
@@ -164,8 +166,7 @@ dzn_fnc_civen_randomizeParkedVehicle = {
 	
 	params ["_v", "_settings"];
 	
-	private["_fuelMax","_lockedChanceMax","_damageMax"];
-	
+	private["_fuelMax","_lockedChanceMax","_damageMax"];	
 	
 	// Settings	
 	private _fuelMax = ResolveParam(
@@ -195,16 +196,17 @@ dzn_fnc_civen_randomizeParkedVehicle = {
 	Initialization
 */
 
-dzn_fnc_civen_initLocation = {
+dzn_fnc_civen_initLocation = {	
 	params["_loc"];
+	if (_loc getVariable ["dzn_civen_initialized", false]) exitWith {};
 	
 	_getRandom = {
 		round( random [
 			_this select 0
-			, ceil(_this select 0 + _this select 1)/2 
+			, ceil( (_this select 0) + (_this select 1) )/2 
 			,_this select 1
 		])	
-	}
+	};
 	_getRange = {
 		if (_this isEqualTo []) then { [0,0] } else { _this }	
 	};	
@@ -215,7 +217,7 @@ dzn_fnc_civen_initLocation = {
 	} else {
 		[dzn_civen_locationSettings, _loc getVariable "dzn_civen_configName"] call dzn_fnc_getValueByKey
 	};
-	IF_DEBUG(player sideChat format ["LOC %1: %2",  _loc, _locSettings]);
+	if (DEBUG) then { player sideChat format ["LOC %1: %2",  _loc, _locSettings]; };
 	
 	/*
 		Get Population		- format X (Number)
@@ -289,8 +291,8 @@ dzn_fnc_civen_initLocation = {
 			_area pushBack ([_x, true] call dzn_fnc_convertTriggerToLocation);
 		};
 	} forEach _areaTrgs;	
-	IF_DEBUG(player sideChat format ["LOC %1: dzn_civen_area: %2", _loc, _area]);		
-	IF_DEBUG(player sideChat format ["LOC AREA POS: %1", _area call dzn_fnc_getZonePosition]);
+	if (DEBUG) then {  player sideChat format ["LOC %1: dzn_civen_area: %2", _loc, _area]; };		
+	if (DEBUG) then { player sideChat format ["LOC AREA POS: %1", _area call dzn_fnc_getZonePosition]; };
 		
 	/*
 		Set up Location properties
@@ -317,8 +319,10 @@ dzn_fnc_civen_initLocation = {
 	
 	if (dzn_civen_allowTraffic) then {
 		_loc setVariable ["dzn_civen_currentTraffic", []];
-	};	
-}
+	};
+
+	_loc setVariable ["dzn_civen_initialized", true];
+};
 
 
 
@@ -332,7 +336,7 @@ dzn_fnc_civen_initialize = {
 	
 	{
 		_x call dzn_fnc_civen_initLocation;		
-		sleep 2;
+		sleep 1;
 	} forEach (synchronizedObjects dzn_civen_core);
 	
 	/*
@@ -341,4 +345,14 @@ dzn_fnc_civen_initialize = {
 	if (dzn_civen_allowTraffic) then {
 		[] execFSM "dzn_civen\FSM\dzn_civen_trafficControl.fsm";
 	};
+	
+	dzn_civen_initialized = true;
+	publicVariable "dzn_civen_initialized";
+};
+
+dzn_fnc_civen_activateAllLocations = {
+	{
+		_x call dzn_fnc_civen_activateLocation;		
+		sleep 2;
+	} forEach (synchronizedObjects dzn_civen_core);
 };
