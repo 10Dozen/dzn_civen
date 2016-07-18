@@ -17,4 +17,7 @@ call compile preProcessFileLineNumbers "dzn_civen\fn\dzn_civen_trafficFunctions.
 [] spawn {
 	waitUntil { time > dzn_civen_InitTime };
 	[] call dzn_fnc_civen_initialize;
+	
+	waitUntil { dzn_civen_initialized };
+	[] call dzn_fnc_civen_activateAllLocations;
 };
