@@ -46,15 +46,15 @@ dzn_fnc_civen_getTrafficEndedElements = {
 	
 	{
 		{
-			_v = _x;;
-			_dest = _v getVariable "dzn_civen_destination";
+			private _v = _x;
+			private _dest = _v getVariable "dzn_civen_destination";
 			
 			if (
 				[getPosASL _v, GetLP(_dest, "area")] call dzn_fnc_isInLocation 
 				&& { !(_dest call dzn_fnc_civen_checkNearPlayers) }
 			) then {
 				_listOfTraffic pushBack _v;
-			};			
+			};	
 		
 		} forEach ( GetLP(_x, "currenttraffic") );
 	} forEach (synchronizedObjects dzn_civen_core);
@@ -147,60 +147,27 @@ dzn_fnc_civen_createTrafficElement = {
 		,["dzn_civen_assignedCrew"		, _crew]		
 	];
 	
+	TV = _v;
+	
 	_loc setVariable [
 		"dzn_civen_currentTraffic"
 		, (_loc getVariable "dzn_civen_currentTraffic") + [_v]
-	];
-	
+	];	
 	
 	/*
 		Move traffic element	
 	*/
-	private _areaPos =  [_destination, "areapos"] call dzn_fnc_civen_getLocProperty;	
-	
-	sleep round(20 + random 60 + (random 10)*20); 
-	// setDestination ??
-	(driver _v) doMove (_areaPos select 0);
-	
-	sleep 60;
-	[_v] spawn dzn_fnc_civen_handleTrafficElementDestination;
-};
-
-dzn_fnc_civen_handleTrafficElementDestination = {
-	params["_v"];
-
-	private _initLoc = [ _v getVariable "dzn_civen_ownerLoc" , "area"] call dzn_fnc_civen_getLocProperty;
-		
-	if (DEBUG) then { 
-		player sideChat format ["Vehicle %1 -- initLoc is %2", _v, _initLoc];
-		debuglog format ["Vehicle %1 -- initLoc is %2", _v, _initLoc];
-	};
-		
-	waitUntil {
-		sleep 60; 
-		!canMove _v 
-		|| !(
-			[getPosATL _v, _initLoc] call dzn_fnc_isInLocation				
-			&& speed _v < 10
-		)
-	};		
-	
-	waitUntil { sleep 30; !([_v, 1000] call dzn_fnc_isPlayerNear) };
-	_v call dzn_fnc_civen_deleteTrafficElement;		
+	sleep round(20 + random 60 + (random 10)*20);
+	(driver _v) doMove ( ([_destination, "areapos"] call dzn_fnc_civen_getLocProperty) select 0 );
 };
 
 dzn_fnc_civen_deleteTrafficElement = {
-	// @Group call dzn_fnc_civen_deleteTrafficElement
-	params ["_v"];
+	// @Vehicle call dzn_fnc_civen_deleteTrafficElement	
+	_this call dzn_fnc_civen_excludeTrafficElement;	
 	
-	private _crew = _v getVariable "dzn_civen_assignedCrew";	
-	{_v deleteVehicleCrew _x} forEach (crew _v);	
-	if !(_crew isEqualTo []) then {
-		{ deleteVehicle _x; } forEach _crew;
-	};
-	
-	_v call dzn_fnc_civen_excludeTrafficElement;
-	deleteVehicle _v;	
+	private _crew = _this getVariable "dzn_civen_assignedCrew";	
+	{ deleteVehicle _x; } forEach _crew;	
+	deleteVehicle _this;	
 };
 
 dzn_fnc_civen_excludeTrafficElement = {
