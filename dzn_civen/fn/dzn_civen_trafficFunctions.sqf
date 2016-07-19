@@ -1,4 +1,4 @@
-#define	DEBUG		false
+#define	DEBUG		true
 #define GetLP(LOC,PROP)						[LOC, PROP] call dzn_fnc_civen_getLocProperty
 
 dzn_fnc_civen_checkNearPlayers = {
@@ -146,8 +146,6 @@ dzn_fnc_civen_createTrafficElement = {
 		,["dzn_civen_destination"		, _destination]
 		,["dzn_civen_assignedCrew"		, _crew]		
 	];
-	
-	TV = _v;
 	
 	_loc setVariable [
 		"dzn_civen_currentTraffic"
