@@ -1,4 +1,4 @@
-#define	DEBUG		true
+#define	DEBUG		false
 #define GetLP(LOC,PROP)						[LOC, PROP] call dzn_fnc_civen_getLocProperty
 
 dzn_fnc_civen_checkNearPlayers = {
