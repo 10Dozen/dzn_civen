@@ -196,6 +196,40 @@ dzn_fnc_civen_randomizeParkedVehicle = {
 	Initialization
 */
 
+dzn_fnc_civen_setLocationPropertiesFromConfigLine = {
+	/*
+		_loc call dzn_fnc_civen_parseConfigLine
+		
+		Config line is taken from 'dzn_civen_configLine' variable of location:
+		e.g. '
+		this setVariable ["dzn_civen_configLine", 'civAmount=[1,5]; vehAmount=[1,5]; civType="greececivil"; vehType="GreeceVehicles";']
+		
+	*/
+	if (isNil {_this getVariable "dzn_civen_configLine"}) exitWith {};
+	
+	private _configList = (_this getVariable "dzn_civen_configLine") splitString ";";
+	{
+		call compile ("dzn_civen_parsed_" + (_x splitString " " joinString ""));
+	} forEach _configList;
+	
+	TV = _configList;
+	{		
+		if (!isNil (_x select 0)) then {
+			_this setVariable [
+				_x select 1
+				, call compile (_x select 0)
+			];
+			
+			call compile ((_x select 0) + "= nil");
+		};
+	} forEach [
+		["dzn_civen_parsed_civAmount", "dzn_civen_population"]
+		,["dzn_civen_parsed_vehAmount", "dzn_civen_parkedCount"]
+		,["dzn_civen_parsed_civType", "dzn_civen_populationType"]
+		,["dzn_civen_parsed_vehType", "dzn_civen_vehicleType"]
+	];
+};
+
 dzn_fnc_civen_initLocation = {	
 	params["_loc"];
 	if (_loc getVariable ["dzn_civen_initialized", false]) exitWith {};
@@ -218,6 +252,11 @@ dzn_fnc_civen_initLocation = {
 		[dzn_civen_locationSettings, _loc getVariable "dzn_civen_configName"] call dzn_fnc_getValueByKey
 	};
 	if (DEBUG) then { player sideChat format ["LOC %1: %2",  _loc, _locSettings]; };
+	
+	/*
+		Parse config from location properties
+	*/
+	_loc call dzn_fnc_civen_setLocationPropertiesFromConfigLine;
 	
 	/*
 		Get Population		- format X (Number)
