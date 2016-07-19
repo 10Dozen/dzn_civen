@@ -11,7 +11,6 @@ dzn_fnc_civen_addUnitsControls = {
 		_allCivenUnits = _unitsWithoutAction;
 		
 		{
-			player sideCHat str[_x];
 			_x addAction [
 				"<t color='#cc0000'>- Stop!</t>"
 				, {
