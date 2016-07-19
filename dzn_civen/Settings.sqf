@@ -11,14 +11,19 @@ dzn_civen_ParkedSpawnTimeout			=	2;
 dzn_civen_allowCivils			= true; 
 dzn_civen_enableIdleAnimation		= false;
 dzn_civen_behavior_walkStandChance 	= [	
-										20 /* % Go to Random house */	
-										, 70 /* % Go to Random point */
-										, 20 /* % Stand on current pos */
-									];
+						20 /* % Go to Random house */	
+						, 70 /* % Go to Random point */
+						, 20 /* % Stand on current pos */
+					];
 
 // Seconds too return from DANGER to SAFE behavior
 dzn_civen_enableUnsafeBehaviour	=	true;
 dzn_civen_cooldownTimer			= 	30;
+/*
+	Civil Control
+*/
+dzn_civen_enableCivilControl		= true;
+
 
 /*
  *	Town Parked Vehicles
