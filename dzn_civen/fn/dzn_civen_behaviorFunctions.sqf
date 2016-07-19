@@ -13,6 +13,8 @@ dzn_fnc_civen_switchToSafe = {
 	_this setCombatMode "GREEN";
 	
 	_this call dzn_fnc_civen_playAnimStandUp;
+	
+	_unit setVariable ["dzn_civen_inDanger", false];
 };
 
 

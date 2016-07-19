@@ -1,6 +1,4 @@
-#define DEBUG								true
-
-#define IF_DEBUG(X)							if (DEBUG) then { X; }
+#define DEBUG								false
 #define GetLP(LOC,PROP)						[LOC, PROP] call dzn_fnc_civen_getLocProperty
 #define ResolveParam(ISGLOBAL,GVAL,LVAL)	if (ISGLOBAL) then {GVAL} else {LVAL}
 
@@ -103,8 +101,7 @@ dzn_fnc_civen_activateLocation = {
 				sleep 15;
 				if (_isListener && dzn_civen_enableUnsafeBehaviour) then {
 					_unit setVariable ["dzn_civen_homeLocation", _loc];
-					_unit addeventhandler ['FiredNear', {
-					player sideChat "SHOOTING!!!";
+					_unit addeventhandler ['FiredNear', {					
 						((_this select 0) getVariable "dzn_civen_homeLocation") call dzn_fnc_civen_setLocDanger;
 					}];
 				};
@@ -112,6 +109,8 @@ dzn_fnc_civen_activateLocation = {
 			
 			_u setVariable ["dzn_civen_home",_home];
 			[_u, _loc] execFSM "dzn_civen\FSM\dzn_civen_civilianBehavior.fsm";
+			
+			dzn_civen_allUnits pushBack _u;
 		};			
 	};
 	
@@ -212,7 +211,7 @@ dzn_fnc_civen_setLocationPropertiesFromConfigLine = {
 		call compile ("dzn_civen_parsed_" + (_x splitString " " joinString ""));
 	} forEach _configList;
 	
-	TV = _configList;
+	
 	{		
 		if (!isNil (_x select 0)) then {
 			_this setVariable [
