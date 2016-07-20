@@ -33,34 +33,36 @@ dzn_fnc_civen_getTrafficNeededLocations = {
 
 dzn_fnc_civen_getTrafficEndedElements = {
 	// call dzn_fnc_civen_getTrafficEndedElements
-	// RETURN: Array of groups to delete
+	// RETURN: Array of groups to delete	
 	
-	private[
-		"_listOfTraffic"
-		,"_v"
-		,"_dest"
-		,"_trafficGrp"
-	];
-	
-	_listOfTraffic = [];
+	private _listOfTraffic = [];
 	
 	{
 		{
-			private _v = _x;
-			private _dest = _v getVariable "dzn_civen_destination";
-			private _isAtDestination = [getPosASL _v, GetLP(_dest, "area")] call dzn_fnc_isInLocation;	
+			private _v = _x;			 				
+			private _pos = getPosASL _v;			
+			private _isAtDestination = [_pos, GetLP(_v getVariable "dzn_civen_destination", "area")] call dzn_fnc_isInLocation;
+			
+			if (DEBUG) then {
+				player sideChat format [
+					"Player near = %1; At Dest = %2; Alive = %3; Can move = %4; Started = %5; Speed = %6 ||| Delete? - %7"
+					, [_pos, 600] call dzn_fnc_isPlayerNear
+					, _isAtDestination
+					, alive _v
+					, canMove _v
+					, _v getVariable "dzn_civen_trafficStarted"
+					, speed _v
+					, (_isAtDestination || !alive _v || !canMove _v || (_v getVariable "dzn_civen_trafficStarted" && speed _v < 10) ) && !([_pos, 600] call dzn_fnc_isPlayerNear)
+				];
+			};
 			
 			if (
 				(
 					_isAtDestination
-					||
-					!canMove _v
-					||
-					!alive _v
-					||
-					(!_isAtDestination && speed _v < 15)					
-				)				
-				&& { !(_dest call dzn_fnc_civen_checkNearPlayers) }
+					|| !alive _v 
+					|| !canMove _v
+					|| (_v getVariable "dzn_civen_trafficStarted" && speed _v < 15)										
+				) && { !( [_pos, 600] call dzn_fnc_isPlayerNear ) }
 			) then {
 				_listOfTraffic pushBack _v;
 			};	
@@ -87,6 +89,8 @@ dzn_fnc_civen_createTrafficElement = {
 	/*
 		Vehicle
 	*/
+	if ( (GetLP(_loc, "roads")) isEqualTo [] ) exitWith {};
+	
 	private _road = selectRandom ( GetLP(_loc, "roads") );
 	private _dir = [
 		_road
@@ -145,7 +149,12 @@ dzn_fnc_civen_createTrafficElement = {
 		
 		_u allowDamage true;
 		
-		_crew pushBack _u;
+		if (vehicle _u == _u) then {
+			deleteVehicle _u;
+			_i = _grpSize;
+		} else {
+			_crew pushBack _u;
+		};
 	};
 	
 	{
@@ -153,7 +162,8 @@ dzn_fnc_civen_createTrafficElement = {
 	} forEach [
 		["dzn_civen_ownerLoc"			, _loc]
 		,["dzn_civen_destination"		, _destination]
-		,["dzn_civen_assignedCrew"		, _crew]		
+		,["dzn_civen_assignedCrew"		, _crew]	
+		,["dzn_civen_trafficStarted"		, false]
 	];
 	
 	_loc setVariable [
@@ -165,6 +175,7 @@ dzn_fnc_civen_createTrafficElement = {
 		Move traffic element	
 	*/
 	sleep round(20 + random 60 + (random 10)*20);
+	_v setVariable ["dzn_civen_trafficStarted", true];
 	(driver _v) doMove ( ([_destination, "areapos"] call dzn_fnc_civen_getLocProperty) select 0 );
 };
 
