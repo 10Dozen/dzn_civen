@@ -15,6 +15,7 @@ dzn_fnc_civen_switchToSafe = {
 	_this call dzn_fnc_civen_playAnimStandUp;
 	
 	_unit setVariable ["dzn_civen_inDanger", false];
+	_this disableConversation false;
 };
 
 
@@ -32,6 +33,8 @@ dzn_fnc_civen_switchToDanger = {
 		_this spawn dzn_fnc_civen_playAnimKeepLying;
 		
 	};
+	
+	_this disableConversation true;
 	
 	_this setBehaviour "COMBAT";
 	_this setSpeedMode "FULL";
