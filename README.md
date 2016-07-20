@@ -27,7 +27,7 @@ After town population created - traffic will be spawned too.
 #### Setting File
 See <tt>dzn_civen\Settings.sqf</tt> and <tt>dzn_civen\Configs.sqf</tt>.
 
-#### Location
+#### Location Config
 Locations where population should be spawned is fully user-defined. You can simply place any object from GameLogic-Locations or place any GameLogic object and set any custom name to <tt>Description</tt>.
 Location *should be* synchronized with triggers(1...n) and <tt>dzn_civen_core</tt> object.
 <br>**Location Settings** are defined in <tt>**dzn_civen_locationSettings**</tt> array. Format of the array is next:
@@ -39,7 +39,13 @@ Location *should be* synchronized with triggers(1...n) and <tt>dzn_civen_core</t
 <br><tt>"VehicleType1"</tt> - name of the vehicles template (see <tt>dzn_civen_vehicleTypes</tt>)
 <br><tt>0.3</tt> or <tt>[5,6]</tt> - quantity of parked vehicles per civilian - 0.3 means that there will be 3 parked vehicles per 10 spawned civilians OR min and max number of parked vehicles per locations.
 
-#### Population
+##### Location Config: Config line
+You can add variable to Location object to customize location config. E.g.
+    
+    this setVariable ["dzn_civen_configLine", 'civAmount=[1,5]; vehAmount=[1,5]; civType="greececivil"; vehType="GreeceVehicles";']
+
+
+#### Population Config
 Civilians have 2 behaviours: *safe* and *danger*. Behavior is the same for all civilians of one location. If anyone is shooting near civilians, location become *danger* - civilians are falls to the ground or start to run in panic. After time, defined as <tt>dzn_civen_cooldownTimer</tt>, is passed - location become *safe*. In *safe* state civilians can walk from street to street, enter buildings or simply stant and watch around.
 <br>**Population Settings** are defined in <tt>**dzn_civen_civilianTypes**</tt> array. Format of the array is next:
 <br> <tt>[ "CivilianType1", [	["C_man_1", "C_man_polo_1_F_afro"], ["kit_civRandom"], { }	]</tt>
@@ -61,7 +67,7 @@ Civilians have 2 behaviours: *safe* and *danger*. Behavior is the same for all c
 <br><tt>{ }</tt> - code which will be called for each created vehicle, *_this* will reffer to vehicle
 <br><tt>[.7,.1,.1]</tt> - *fuel*, *locked chance* and *damage* limits (for damage - 0 means no damage, 1 - destroyed)
 
-##### Traffic
+#### Traffic Config
 Traffic will be created for each location - from location to all other locations. After vehicle reaches position of location object and there is no players near - vehicle and crew will be deleted and new traffic vehicle will be spawned instead. If vehicle stucked or cannot move anymore - it will be deleted too.
 <br>Next **options** are available:
 <br><tt>dzn_civen_allowTraffic</tt> - <tt>true</tt> to enable traffic between location, <tt>false</tt> to disable
