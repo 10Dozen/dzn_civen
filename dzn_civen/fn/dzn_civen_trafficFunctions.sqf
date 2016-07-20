@@ -48,8 +48,7 @@ dzn_fnc_civen_getTrafficEndedElements = {
 		{
 			private _v = _x;
 			private _dest = _v getVariable "dzn_civen_destination";
-			private _isAtDestination = [getPosASL _v, GetLP(_dest, "area")] call dzn_fnc_isInLocation;
-			
+			private _isAtDestination = [getPosASL _v, GetLP(_dest, "area")] call dzn_fnc_isInLocation;	
 			
 			if (
 				(
@@ -59,7 +58,7 @@ dzn_fnc_civen_getTrafficEndedElements = {
 					||
 					!alive _v
 					||
-					( !_isAtDestination &&  speed _v < 15)					
+					(!_isAtDestination && speed _v < 15)					
 				)				
 				&& { !(_dest call dzn_fnc_civen_checkNearPlayers) }
 			) then {
@@ -186,3 +185,8 @@ dzn_fnc_civen_excludeTrafficElement = {
 		, (_loc getVariable "dzn_civen_currentTraffic") - [_this]
 	];
 };
+
+
+
+
+
