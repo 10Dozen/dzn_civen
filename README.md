@@ -40,7 +40,7 @@ Location *should be* synchronized with triggers(1...n) and <tt>dzn_civen_core</t
 <br><tt>0.3</tt> or <tt>[5,6]</tt> - quantity of parked vehicles per civilian - 0.3 means that there will be 3 parked vehicles per 10 spawned civilians OR min and max number of parked vehicles per locations.
 
 ##### Location Config: Config line
-You can add variable to Location object to customize location config. E.g.
+You can add variable to Location object to customize location config for certain location:
     
     this setVariable ["dzn_civen_configLine", 'civAmount=[1,5]; vehAmount=[1,5]; civType="greececivil"; vehType="GreeceVehicles";']
 
