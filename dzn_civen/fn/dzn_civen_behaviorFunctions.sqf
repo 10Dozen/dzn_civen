@@ -7,12 +7,14 @@ dzn_fnc_civen_switchToSafe = {
 	// @Unit call dzn_fnc_civen_switchToSafe
 	// Switch unit to safe state
 	_this stop false;
+	_this call dzn_fnc_civen_playAnimStandUp;
 	
 	_this setBehaviour "CARELESS";
 	_this setSpeedMode "LIMITED";
-	_this setCombatMode "GREEN";
+	_this setCombatMode "GREEN";	
 	
-	_this call dzn_fnc_civen_playAnimStandUp;
+	_unit setVariable ["dzn_civen_inDanger", false];
+	_this disableConversation false;
 };
 
 
@@ -30,6 +32,8 @@ dzn_fnc_civen_switchToDanger = {
 		_this spawn dzn_fnc_civen_playAnimKeepLying;
 		
 	};
+	
+	_this disableConversation true;
 	
 	_this setBehaviour "COMBAT";
 	_this setSpeedMode "FULL";
@@ -58,7 +62,7 @@ dzn_fnc_civen_playAnimKeepLying = {
 };
 
 dzn_fnc_civen_playAnimStandUp = {
-	if (behaviour _this != "COMBAT") then {
+	if (behaviour _this == "COMBAT") then {
 		_this switchMove "AfdsPpneMstpSnonWnonDnon_AfdsPercMstpSnonWnonDnon";
 	};
 };

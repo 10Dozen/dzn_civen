@@ -17,7 +17,7 @@ dzn_civen_locationSettings = [
 		"LocationCity_F",		["GreeceCivil", [2,6], "GreeceVehicles", [6,10]] 
 	]
 	,[ 
-		"LocationVillage_F",	["GreeceCivil", [2,6], "GreeceVehicles", [6,13]] 
+		"LocationCamp_F",	["GreeceCivil", [1,1], "GreeceVehicles", [1,1]] 
 	]
 ];
 

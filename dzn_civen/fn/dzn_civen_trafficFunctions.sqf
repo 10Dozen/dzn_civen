@@ -33,28 +33,39 @@ dzn_fnc_civen_getTrafficNeededLocations = {
 
 dzn_fnc_civen_getTrafficEndedElements = {
 	// call dzn_fnc_civen_getTrafficEndedElements
-	// RETURN: Array of groups to delete
+	// RETURN: Array of groups to delete	
 	
-	private[
-		"_listOfTraffic"
-		,"_v"
-		,"_dest"
-		,"_trafficGrp"
-	];
-	
-	_listOfTraffic = [];
+	private _listOfTraffic = [];
 	
 	{
 		{
-			_v = _x;;
-			_dest = _v getVariable "dzn_civen_destination";
+			private _v = _x;			 				
+			private _pos = getPosASL _v;			
+			private _isAtDestination = [_pos, GetLP(_v getVariable "dzn_civen_destination", "area")] call dzn_fnc_isInLocation;
+			
+			if (DEBUG) then {
+				player sideChat format [
+					"Player near = %1; At Dest = %2; Alive = %3; Can move = %4; Started = %5; Speed = %6 ||| Delete? - %7"
+					, [_pos, 600] call dzn_fnc_isPlayerNear
+					, _isAtDestination
+					, alive _v
+					, canMove _v
+					, _v getVariable "dzn_civen_trafficStarted"
+					, speed _v
+					, (_isAtDestination || !alive _v || !canMove _v || (_v getVariable "dzn_civen_trafficStarted" && speed _v < 10) ) && !([_pos, 600] call dzn_fnc_isPlayerNear)
+				];
+			};
 			
 			if (
-				[getPosASL _v, GetLP(_dest, "area")] call dzn_fnc_isInLocation 
-				&& { !(_dest call dzn_fnc_civen_checkNearPlayers) }
+				(
+					_isAtDestination
+					|| !alive _v 
+					|| !canMove _v
+					|| (_v getVariable "dzn_civen_trafficStarted" && speed _v < 15)										
+				) && { !( [_pos, 600] call dzn_fnc_isPlayerNear ) }
 			) then {
 				_listOfTraffic pushBack _v;
-			};			
+			};	
 		
 		} forEach ( GetLP(_x, "currenttraffic") );
 	} forEach (synchronizedObjects dzn_civen_core);
@@ -78,6 +89,8 @@ dzn_fnc_civen_createTrafficElement = {
 	/*
 		Vehicle
 	*/
+	if ( (GetLP(_loc, "roads")) isEqualTo [] ) exitWith {};
+	
 	private _road = selectRandom ( GetLP(_loc, "roads") );
 	private _dir = [
 		_road
@@ -136,7 +149,12 @@ dzn_fnc_civen_createTrafficElement = {
 		
 		_u allowDamage true;
 		
-		_crew pushBack _u;
+		if (vehicle _u == _u) then {
+			deleteVehicle _u;
+			_i = _grpSize;
+		} else {
+			_crew pushBack _u;
+		};
 	};
 	
 	{
@@ -144,63 +162,30 @@ dzn_fnc_civen_createTrafficElement = {
 	} forEach [
 		["dzn_civen_ownerLoc"			, _loc]
 		,["dzn_civen_destination"		, _destination]
-		,["dzn_civen_assignedCrew"		, _crew]		
+		,["dzn_civen_assignedCrew"		, _crew]	
+		,["dzn_civen_trafficStarted"		, false]
 	];
 	
 	_loc setVariable [
 		"dzn_civen_currentTraffic"
 		, (_loc getVariable "dzn_civen_currentTraffic") + [_v]
-	];
-	
+	];	
 	
 	/*
 		Move traffic element	
 	*/
-	private _areaPos =  [_destination, "areapos"] call dzn_fnc_civen_getLocProperty;	
-	
-	sleep round(20 + random 60 + (random 10)*20); 
-	// setDestination ??
-	(driver _v) doMove (_areaPos select 0);
-	
-	sleep 60;
-	[_v] spawn dzn_fnc_civen_handleTrafficElementDestination;
-};
-
-dzn_fnc_civen_handleTrafficElementDestination = {
-	params["_v"];
-
-	private _initLoc = [ _v getVariable "dzn_civen_ownerLoc" , "area"] call dzn_fnc_civen_getLocProperty;
-		
-	if (DEBUG) then { 
-		player sideChat format ["Vehicle %1 -- initLoc is %2", _v, _initLoc];
-		debuglog format ["Vehicle %1 -- initLoc is %2", _v, _initLoc];
-	};
-		
-	waitUntil {
-		sleep 60; 
-		!canMove _v 
-		|| !(
-			[getPosATL _v, _initLoc] call dzn_fnc_isInLocation				
-			&& speed _v < 10
-		)
-	};		
-	
-	waitUntil { sleep 30; !([_v, 1000] call dzn_fnc_isPlayerNear) };
-	_v call dzn_fnc_civen_deleteTrafficElement;		
+	sleep round(20 + random 60 + (random 10)*20);
+	_v setVariable ["dzn_civen_trafficStarted", true];
+	(driver _v) doMove ( ([_destination, "areapos"] call dzn_fnc_civen_getLocProperty) select 0 );
 };
 
 dzn_fnc_civen_deleteTrafficElement = {
-	// @Group call dzn_fnc_civen_deleteTrafficElement
-	params ["_v"];
+	// @Vehicle call dzn_fnc_civen_deleteTrafficElement	
+	_this call dzn_fnc_civen_excludeTrafficElement;	
 	
-	private _crew = _v getVariable "dzn_civen_assignedCrew";	
-	{_v deleteVehicleCrew _x} forEach (crew _v);	
-	if !(_crew isEqualTo []) then {
-		{ deleteVehicle _x; } forEach _crew;
-	};
-	
-	_v call dzn_fnc_civen_excludeTrafficElement;
-	deleteVehicle _v;	
+	private _crew = _this getVariable "dzn_civen_assignedCrew";	
+	{ deleteVehicle _x; } forEach _crew;	
+	deleteVehicle _this;	
 };
 
 dzn_fnc_civen_excludeTrafficElement = {

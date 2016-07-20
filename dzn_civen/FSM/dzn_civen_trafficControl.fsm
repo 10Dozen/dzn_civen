@@ -7,7 +7,7 @@ item2[] = {"Check_for_Traffi",2,250,-50.000000,-1075.000000,50.000000,-1025.0000
 item3[] = {"Need_to_Spawn",4,218,-50.000000,-1000.000000,50.000000,-950.000000,2.000000,"Need to Spawn"};
 item4[] = {"Add_Traffic",2,250,-50.000000,-925.000000,50.000000,-875.000000,0.000000,"Add Traffic"};
 item5[] = {"Need_to_Remove",4,218,-50.000000,-850.000000,50.000000,-800.000000,1.000000,"Need to Remove"};
-item6[] = {"Remove_Traffic",2,4346,-50.000000,-775.000000,50.000000,-725.000000,0.000000,"Remove Traffic"};
+item6[] = {"Remove_Traffic",2,250,-50.000000,-775.000000,50.000000,-725.000000,0.000000,"Remove Traffic"};
 item7[] = {"Loop",4,218,-175.000000,-1075.000000,-75.000000,-1025.000000,0.000000,"Loop"};
 item8[] = {"",7,210,-129.000000,-754.000000,-121.000000,-746.000000,0.000000,""};
 item9[] = {"",7,210,96.000008,-1054.000000,104.000000,-1046.000000,0.000000,""};
@@ -29,7 +29,7 @@ link12[] = {9,10};
 link13[] = {10,5};
 link14[] = {11,7};
 globals[] = {25.000000,1,0,0,16777215,640,480,1,264,6316128,1,-221.770538,306.503357,-558.665588,-1299.294800,505,708,1};
-window[] = {0,-1,-1,-1,-1,1008,604,1976,155,1,523};
+window[] = {0,-1,-1,-1,-1,978,125,1497,125,1,523};
 *//*%FSM</HEAD>*/
 class FSM
 {
@@ -148,11 +148,7 @@ class FSM
       init = /*%FSM<STATEINIT""">*/"{" \n
        "	_x call dzn_fnc_civen_deleteTrafficElement;" \n
        "} forEach _trafficToRemove;"/*%FSM</STATEINIT""">*/;
-      precondition = /*%FSM<STATEPRECONDITION""">*/"{" \n
-       "" \n
-       "	_x call dzn_fnc_civen_deleteTrafficElement;" \n
-       "" \n
-       "} forEach _trafficToRemove;"/*%FSM</STATEPRECONDITION""">*/;
+      precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
       class Links
       {
         /*%FSM<LINK "Loop">*/
