@@ -11,13 +11,18 @@ dzn_fnc_civen_addUnitsControls = {
 		_allCivenUnits = _unitsWithoutAction;
 		
 		{
-			_x addAction [
-				"<t color='#cc0000'>- Stop!</t>"
-				, {
-					systemChat "- Stop! Don't move!";
-					(_this select 0) setVariable ["dzn_civen_inDanger", true, true];
-				}		
-			];	
+			if (isNil {_x getVariable "dzn_civen_actionStop"}) then {
+				_x setVariable [
+					"dzn_civen_actionStop"
+					, _x addAction [
+						"<t color='#cc0000'>- Stop!</t>"
+						, {
+							systemChat "- Stop! Don't move!";
+							(_this select 0) setVariable ["dzn_civen_inDanger", true, true];
+						}		
+					]
+				];
+			};			
 		} forEach _unitsWithoutAction;		
 
 		sleep 60;
