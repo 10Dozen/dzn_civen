@@ -66,3 +66,46 @@ dzn_fnc_civen_playAnimStandUp = {
 		_this switchMove "AfdsPpneMstpSnonWnonDnon_AfdsPercMstpSnonWnonDnon";
 	};
 };
+
+
+/*
+	Civ Control
+*/
+
+dzn_fnc_civen_civCon_handleUnits = {
+	dzn_fnc_civen_civCon_waitToHanldeUnitList = {
+		dzn_civen_civCon_canHandleUnitList = false;
+		sleep 60;
+		dzn_civen_civCon_canHandleUnitList = true;
+	};
+	
+	dzn_civen_civCon_canHandleUnitList = true;
+	
+	["dzn_civen_civCon_handleUnitList", "onEachFrame", {
+		if !(dzn_civen_civCon_canHandleUnitList) exitWith {};
+		
+		dzn_civen_allUnits = [
+			dzn_civen_allUnits
+			, {
+				private _existAlive = !(isNull _x) && {alive _x};
+				if (_existAlive) then {					
+					
+					
+					
+				} else {
+				
+				};
+				_existAlive
+			}
+		] call BIS_fnc_conditionalSelect;
+		
+		dzn_civen_allUnits = [dzn_civen_allUnits, { !(isNull _x) && {alive _x} }] call BIS_fnc_conditionalSelect;
+		
+		
+		
+		
+		call dzn_fnc_civen_civCon_waitToHanldeUnitList;
+	}] call BIS_fnc_addStackedEventHandler;
+
+};
+
