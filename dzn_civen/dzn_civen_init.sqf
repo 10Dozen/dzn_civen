@@ -17,6 +17,8 @@ dzn_civen_initialized = false;
 dzn_civen_trafficGroup = createGroup civilian;
 dzn_civen_allUnits = [];
 
+dzn_civen_civCon_unitToStop = objNull;
+
 //  **************** INITIALIZATION ********************
 call compile preProcessFileLineNumbers "dzn_civen\Configs.sqf";
 call compile preProcessFileLineNumbers "dzn_civen\fn\dzn_civen_functions.sqf";
