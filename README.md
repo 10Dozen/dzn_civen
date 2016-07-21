@@ -1,5 +1,5 @@
 # dzn_civen
-##### Version: 0.3
+##### Version: 0.4
 
 ### Dependencies
 - dzn_commonFunctions v.0.65 (https://github.com/10Dozen/dzn_commonFunctions)
