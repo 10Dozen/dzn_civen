@@ -1,32 +1,36 @@
+dzn_fnc_civen_civCon_waitToGetUnits = {
+	dzn_civen_civCon_canGetUnits = false;
+	sleep 60;
+	dzn_civen_civCon_canGetUnits = true;
+};
+
 dzn_fnc_civen_addUnitsControls = {
 	waitUntil {!isNil "dzn_civen_initialized"};
+	dzn_civen_civCon_canGetUnits = true;	
 	
-	waitUntil { time > 30 };
-	private _allCivenUnits = [];	
+	waitUntil { time > 30 };	
+	["dzn_civen_civCon_getAllUnits", "onEachFrame", {
+		if !(dzn_civen_civCon_canGetUnits) exitWith {};
+		
+		[missionNamespace, "dzn_civen_allUnits"] call BIS_fnc_getServerVariable;		
 	
-	for "_i" from 1 to 3 do {
-		[missionNamespace, "dzn_civen_allUnits"] call BIS_fnc_getServerVariable;
-		
-		private _unitsWithoutAction = dzn_civen_allUnits - _allCivenUnits;		
-		_allCivenUnits = _unitsWithoutAction;
-		
 		{
-			if (isNil {_x getVariable "dzn_civen_actionStop"}) then {
+			if (isNil {_x getVariable "dzn_civen_civCon_actionStop"}) then {
 				_x setVariable [
-					"dzn_civen_actionStop"
+					"dzn_civen_civCon_actionStop"
 					, _x addAction [
 						"<t color='#cc0000'>- Stop!</t>"
 						, {
 							systemChat "- Stop! Don't move!";
-							(_this select 0) setVariable ["dzn_civen_inDanger", true, true];
+							
+							dzn_civen_civCon_unitToStop = _x;
+							publicVariableServer "dzn_civen_civCon_unitToStop";
 						}		
 					]
 				];
-			};			
-		} forEach _unitsWithoutAction;		
-
-		sleep 60;
-	};
-	
-	dzn_civen_allUnits = nil;
+			};		
+		} forEach dzn_civen_allUnits;
+		
+		call dzn_fnc_civen_civCon_waitToGetUnits;
+	}] call BIS_fnc_addStackedEventHandler;	
 };
