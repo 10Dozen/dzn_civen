@@ -82,18 +82,18 @@ dzn_fnc_civen_playAnimStandUp = {
 */
 
 dzn_fnc_civen_civCon_initialize = {
-    dzn_civen_civCon_unitToStop = objNull;
+	dzn_civen_civCon_unitToStop = objNull;
 
-    "dzn_civen_civCon_unitToStop" addPublicVariableEventHandler [{
-        (_this select 1) call dzn_fnc_civen_civCon_stopUnit;
-        dzn_civen_civCon_unitToStop = objNull;
-    }];
+	"dzn_civen_civCon_unitToStop" addPublicVariableEventHandler [{
+		(_this select 1) call dzn_fnc_civen_civCon_stopUnit;
+		dzn_civen_civCon_unitToStop = objNull;
+	}];
 };
 
 dzn_fnc_civen_civCon_stopUnit = {
-    if !(isNil {_this getVariable "dzn_civen_home"}) then {
-        _this setVariable ["dzn_civen_inDanger", true];
-    } else {
-        _this call dzn_fnc_civen_switchToDanger;
-    };
+	if !(isNil {_this getVariable "dzn_civen_home"}) then {
+		_this setVariable ["dzn_civen_inDanger", true];
+	} else {
+		_this call dzn_fnc_civen_switchToDanger;
+	};
 };
