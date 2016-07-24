@@ -7,7 +7,7 @@ if (hasInterface) then {
 	if !(dzn_civen_enableCivilControl) exitWith {};
 	
 	call compile preProcessFileLineNumbers "dzn_civen\fn\dzn_civen_clientFunctions.sqf";	
-	[] spawn dzn_fnc_civen_addUnitsControls;
+	[] spawn dzn_fnc_civen_civCon_addUnitsControls;
 };
 
 
@@ -15,9 +15,6 @@ if !(isServer || isDedicated) exitWith {};
 
 dzn_civen_initialized = false;
 dzn_civen_trafficGroup = createGroup civilian;
-dzn_civen_allUnits = [];
-
-dzn_civen_civCon_unitToStop = objNull;
 
 //  **************** INITIALIZATION ********************
 call compile preProcessFileLineNumbers "dzn_civen\Configs.sqf";

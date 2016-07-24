@@ -3,7 +3,7 @@
 /*
 item0[] = {"Start",0,250,-50.000000,-1225.000000,50.000000,-1175.000000,0.000000,"Start"};
 item1[] = {"true",4,218,-50.000000,-1150.000000,50.000000,-1100.000000,0.000000,"true"};
-item2[] = {"Check_for_Traffi",2,250,-50.000000,-1075.000000,50.000000,-1025.000000,0.000000,"Check for Traffic"};
+item2[] = {"Check_for_Traffi",2,4346,-50.000000,-1075.000000,50.000000,-1025.000000,0.000000,"Check for Traffic"};
 item3[] = {"Need_to_Spawn",4,218,-50.000000,-1000.000000,50.000000,-950.000000,2.000000,"Need to Spawn"};
 item4[] = {"Add_Traffic",2,250,-50.000000,-925.000000,50.000000,-875.000000,0.000000,"Add Traffic"};
 item5[] = {"Need_to_Remove",4,218,-50.000000,-850.000000,50.000000,-800.000000,1.000000,"Need to Remove"};
@@ -29,7 +29,7 @@ link12[] = {9,10};
 link13[] = {10,5};
 link14[] = {11,7};
 globals[] = {25.000000,1,0,0,16777215,640,480,1,264,6316128,1,-221.770538,306.503357,-558.665588,-1299.294800,505,708,1};
-window[] = {0,-1,-1,-1,-1,978,125,1497,125,1,523};
+window[] = {0,-1,-1,-32000,-32000,878,25,1397,25,1,523};
 *//*%FSM</HEAD>*/
 class FSM
 {
@@ -68,7 +68,7 @@ class FSM
       init = /*%FSM<STATEINIT""">*/"_locToAdd = call dzn_fnc_civen_getTrafficNeededLocations;" \n
        "_trafficToRemove = call dzn_fnc_civen_getTrafficEndedElements;" \n
        "" \n
-       "_timer = time + 60;" \n
+       "_timer = time + 30;" \n
        ""/*%FSM</STATEINIT""">*/;
       precondition = /*%FSM<STATEPRECONDITION""">*/""/*%FSM</STATEPRECONDITION""">*/;
       class Links

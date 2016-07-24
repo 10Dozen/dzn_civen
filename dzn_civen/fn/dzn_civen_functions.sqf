@@ -101,7 +101,7 @@ dzn_fnc_civen_activateLocation = {
 				sleep 15;
 				if (_isListener && dzn_civen_enableUnsafeBehaviour) then {
 					_unit setVariable ["dzn_civen_homeLocation", _loc];
-					_unit addeventhandler ['FiredNear', {					
+					_unit addEventHandler ['FiredNear', {
 						((_this select 0) getVariable "dzn_civen_homeLocation") call dzn_fnc_civen_setLocDanger;
 					}];
 				};
@@ -109,8 +109,6 @@ dzn_fnc_civen_activateLocation = {
 			
 			_u setVariable ["dzn_civen_home",_home];
 			[_u, _loc] execFSM "dzn_civen\FSM\dzn_civen_civilianBehavior.fsm";
-			
-			dzn_civen_allUnits pushBack _u;
 		};			
 	};
 	
