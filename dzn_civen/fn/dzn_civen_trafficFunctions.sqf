@@ -19,14 +19,17 @@ dzn_fnc_civen_getTrafficNeededLocations = {
 	{
 		_curTraffic = GetLP(_x, "currentTraffic");
 		if (
-			count (_curTraffic) < dzn_civen_trafficPerLocation 
-			&& { !(_x call dzn_fnc_civen_checkNearPlayers) }
+			count (_curTraffic) < dzn_civen_trafficPerLocation
+			&& dzn_civen_trafficTotal < dzn_civen_trafficMaxAmount
+			&& GetLP(_x, "trafficAvailable")
+			&& { !(_x call dzn_fnc_civen_checkNearPlayers) }			
 		) then {
 			for "_i" from 1 to (dzn_civen_trafficPerLocation - count (_curTraffic) ) do {
 				_trafficLocationList pushBack _x;
+				dzn_civen_trafficTotal = dzn_civen_trafficTotal + 1;
 			};		
 		};	
-	} forEach (synchronizedObjects dzn_civen_core);
+	} forEach dzn_civen_trafficLocations;
 	
 	_trafficLocationList
 };
@@ -68,7 +71,7 @@ dzn_fnc_civen_getTrafficEndedElements = {
 			};	
 		
 		} forEach ( GetLP(_x, "currenttraffic") );
-	} forEach (synchronizedObjects dzn_civen_core);
+	} forEach dzn_civen_trafficLocations;
 	
 	_listOfTraffic
 };
@@ -84,7 +87,7 @@ dzn_fnc_civen_createTrafficElement = {
 	
 	params["_loc"];
 	
-	private _destination = selectRandom ( (synchronizedObjects dzn_civen_core) - [_loc] );	
+	private _destination = selectRandom ( dzn_civen_trafficLocations - [_loc] );	
 	
 	/*
 		Vehicle
@@ -169,14 +172,26 @@ dzn_fnc_civen_createTrafficElement = {
 	_loc setVariable [
 		"dzn_civen_currentTraffic"
 		, (_loc getVariable "dzn_civen_currentTraffic") + [_v]
-	];	
-	
+	];
+
 	/*
 		Move traffic element	
 	*/
 	sleep round(20 + random 60 + (random 10)*20);
 	_v setVariable ["dzn_civen_trafficStarted", true];
-	(driver _v) doMove ( ([_destination, "areapos"] call dzn_fnc_civen_getLocProperty) select 0 );
+	_v spawn {
+		private _v = _this;
+		private _dest = _v getVariable "dzn_civen_destination";
+		
+		for "_i" from 0 to 60 do {
+			if (isNull _v) exitWith {};			
+			
+			(driver _v) doMove ( ([_dest, "areapos"] call dzn_fnc_civen_getLocProperty) select 0 );
+			dzn_civen_trafficGroup setSpeedMode "FULL";
+			
+			sleep 30;
+		};	
+	};
 };
 
 dzn_fnc_civen_deleteTrafficElement = {
@@ -195,6 +210,7 @@ dzn_fnc_civen_excludeTrafficElement = {
 		"dzn_civen_currentTraffic"
 		, (_loc getVariable "dzn_civen_currentTraffic") - [_this]
 	];
+	dzn_civen_trafficTotal = dzn_civen_trafficTotal - 1;
 };
 
 

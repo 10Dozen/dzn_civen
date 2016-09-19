@@ -17,6 +17,7 @@ dzn_fnc_civen_getLocProperty = {
 		case "areapos":			{ "dzn_civen_areaPos" };	
 		case "safe":			{ "dzn_civen_isSafe" };
 		case "dangertimestamp":	{ "dzn_civen_dangerTimestamp" };
+		case "trafficavailable": { "dzn_civen_trafficAvailable" };
 		case "currenttraffic":	{ "dzn_civen_currentTraffic" };
 	};	
 	
@@ -116,30 +117,76 @@ dzn_fnc_civen_activateLocation = {
 		Spawn vehicle
 	*/
 	private _maxVehicles = GetLP(_loc,"vehicleCount");
-	if (_maxVehicles > 0 && dzn_civen_allowParkedVehicles) then {
+	
+	_checkHouseNear = {
+		private _loc = _this select 0;
+		private _pos = _this select 1;
+		private _range = _this select 2;
+		
+		private _result = false;
+		{
+			if ((_x distance2d _pos) <= _range) exitWith { _result = true };
+		} forEach (GetLP(_loc, "buildings"));
+		
+		_result
+	};
+	
+	if (
+		_maxVehicles > 0
+		&& !( GetLP(_loc,"roads") isEqualTo [] )
+		&& dzn_civen_allowParkedVehicles
+	) then {
 		private _vehicleConfig = [dzn_civen_vehicleTypes, GetLP(_loc,"vehicleType")] call dzn_fnc_getValueByKey;
-		private _roads = GetLP(_loc,"roads");
+		private _roads = GetLP(_loc,"roads");		
 		
 		for "_i" from 1 to _maxVehicles do {
 			sleep dzn_civen_ParkedSpawnTimeout;
 			
-			private _s = if (random(2)>1) then { 1 } else { -1 };
-			private _road = selectRandom _roads;
-			_roads = _roads - [_road];
-			private _dir = [
-				_road
-				, if !(isNil { (roadsConnectedTo _road) select (round(random 1)) }) then { 
-					(roadsConnectedTo _road) select (round(random 1))	
-				} else {
-					(roadsConnectedTo _road) select 0	
-				}
-			] call BIS_fnc_DirTo;		
-			_dir = if (isNil {_dir}) then { 0 } else { _dir };
+			private _vehClass = selectRandom (_vehicleConfig select 0);			
 			
-			private _v = [
-				[(_road modelToWorld [7 * _s, 0, 0]), _dir]
-				, selectRandom (_vehicleConfig select 0)
-			] call dzn_fnc_createVehicle;
+			private _road = objNull;
+			private _s = 0;
+			private _vehPos = [-100,-100,0];
+			private _dir = 0;
+			private _vehPosFound = false;
+			
+			#define	GET_RANDOM_SIGN	if (random(2)>1) then { 1 } else { -1 }
+			#define	CHECK_VEH_POS	((_vehPos isFlatEmpty [(sizeof _vehClass) / 5,-1,300,(sizeof _vehClass)*1.1,0, true]) isEqualTo [] )
+			for "_j" from 0 to 1000 do {
+				_road = selectRandom _roads;
+				_s = GET_RANDOM_SIGN;
+				_vehPos = _road modelToWorld [7 * _s, 0, 0];
+				
+				if ( CHECK_VEH_POS && [_loc, _vehPos, 40] call _checkHouseNear ) exitWith {
+					_vehPosFound = true;
+					_roads = _roads - [_road];
+					
+					_dir = [
+						_road
+						, if !(isNil { (roadsConnectedTo _road) select (round(random 1)) }) then { 
+							(roadsConnectedTo _road) select (round(random 1))	
+						} else {
+							(roadsConnectedTo _road) select 0	
+						}
+					] call BIS_fnc_DirTo;					
+					_dir = if (isNil {_dir}) then { 0 } else { _dir };
+				};			
+			};
+			
+			if !(_vehPosFound) then {
+				for "_j" from 0 to 1000 do {
+					_s = GET_RANDOM_SIGN;
+					_vehPos = (selectRandom (GetLP(_loc, "buildings"))) modelToWorld [35 * _s, random(30) * _s, 0];	
+				
+					if ( CHECK_VEH_POS ) exitWith {
+						_vehPosFound = true;
+					};
+				};
+			};	
+			
+			if !(_vehPosFound) exitWith {};
+			
+			private _v = [[_vehPos, _dir], _vehClass] call dzn_fnc_createVehicle;			
 			
 			// Assign Cargo Gear
 			if !((_vehicleConfig select 1) isEqualTo []) then {
@@ -152,6 +199,8 @@ dzn_fnc_civen_activateLocation = {
 			[_v, _vehicleConfig select 3] spawn dzn_fnc_civen_randomizeParkedVehicle;			
 		};
 	};
+	if (DEBUG) then { player sideChat format["CIVEN: Location activated - %1", _loc]; };
+	
 	
 	_loc execFSM "dzn_civen\FSM\dzn_civen_locationState.fsm";	
 	_loc setVariable ["dzn_civen_isActive", true];
@@ -333,33 +382,38 @@ dzn_fnc_civen_initLocation = {
 	/*
 		Set up Location properties
 	*/
-	{
-		_loc setVariable [_x select 0, _x select 1];
-	} forEach [
-		["dzn_civen_population"			, _population]
-		,["dzn_civen_populationType"	, _populationType]
-		,["dzn_civen_vehicleCount"		, _parkedCount]
-		,["dzn_civen_vehicleType"		, _vehicleType]
-		,["dzn_civen_area"				, _area]
-		,["dzn_civen_areaPos"			,  _area call dzn_fnc_getZonePosition]
-		,["dzn_civen_buildings"			, [_area] call dzn_fnc_getLocationBuildings]
-		,["dzn_civen_roads"				, _area call dzn_fnc_getLocationRoads]
-		,["dzn_civen_isSafe"			, true]
-		,["dzn_civen_dangerTimestamp"	, 0]
-	];
+	
+	private _roads = _area call dzn_fnc_getLocationRoads;
+	[
+		_loc
+		, [
+			["dzn_civen_population"			, _population]
+			,["dzn_civen_populationType"		, _populationType]
+			,["dzn_civen_vehicleCount"		, _parkedCount]
+			,["dzn_civen_vehicleType"		, _vehicleType]
+			,["dzn_civen_area"			, _area]
+			,["dzn_civen_areaPos"			,  _area call dzn_fnc_getZonePosition]
+			,["dzn_civen_buildings"			, [_area] call dzn_fnc_getLocationBuildings]
+			,["dzn_civen_roads"			, _roads]
+			,["dzn_civen_isSafe"			, true]
+			,["dzn_civen_dangerTimestamp"		, 0]
+			,["dzn_civen_trafficAvailable"	, !(_roads isEqualTo []) ]
+		]
+	] call dzn_fnc_setVars;
 	
 	// If no 'isActive' or 'isActive' == true - run activate location.
 	if (_loc getVariable ["dzn_civen_isActive", false]) then {
 		_loc spawn dzn_fnc_civen_activateLocation;
 	};
 	
-	if (dzn_civen_allowTraffic) then {
+	if (dzn_civen_allowTraffic && GetLP(_loc,"trafficAvailable")) then {
 		_loc setVariable ["dzn_civen_currentTraffic", []];
+		dzn_civen_trafficLocations pushBack _loc;
 	};
 
+	dzn_civen_locations pushBack _loc;
 	_loc setVariable ["dzn_civen_initialized", true];
 };
-
 
 
 dzn_fnc_civen_initialize = {
@@ -372,7 +426,7 @@ dzn_fnc_civen_initialize = {
 	
 	{
 		_x call dzn_fnc_civen_initLocation;		
-		sleep 1;
+		sleep dzn_civen_LocationInitTimeout;
 	} forEach (synchronizedObjects dzn_civen_core);
 	
 	/*
@@ -389,6 +443,7 @@ dzn_fnc_civen_initialize = {
 dzn_fnc_civen_activateAllLocations = {
 	{
 		_x call dzn_fnc_civen_activateLocation;		
-		sleep 2;
+		sleep dzn_civen_LocationActivateTimeout;
+		if (DEBUG) then { player sideChat format ["CIVEN: Activate %1", _x]; };
 	} forEach (synchronizedObjects dzn_civen_core);
 };
