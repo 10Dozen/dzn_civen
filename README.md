@@ -1,9 +1,9 @@
 # dzn_civen
-##### Version: 0.3
+##### Version: 0.4
 
 ### Dependencies
-- dzn_commonFunctions v.0.65 (https://github.com/10Dozen/dzn_commonFunctions)
-- dzn_gear v.2.2 (https://github.com/10Dozen/dzn_gear)
+- dzn_commonFunctions v.0.7 (https://github.com/10Dozen/dzn_commonFunctions)
+- dzn_gear v.2.2+ (https://github.com/10Dozen/dzn_gear)
 <hr>
 
 ### How To
